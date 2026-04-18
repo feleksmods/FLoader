@@ -1,0 +1,5 @@
+fl.registry.registerCommand("reload", function()
+    fl.utils.log("Reloading FLoader...")
+    fl.utils.reloadFL()
+    fl.utils.log("FLoader reloaded!")
+end)

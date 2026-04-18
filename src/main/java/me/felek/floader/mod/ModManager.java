@@ -22,6 +22,25 @@ public class ModManager {
         LOADED_MODS = new ArrayList<>();
     }
 
+    public static boolean loadBaseMod() {
+        FLoader.LOGGER.info("Loading internal BaseMod");
+        String script = IOLib.readResourceText("/floader/scripts/script.lua");
+
+        if (script == null || script.isEmpty()) {
+            FLoader.LOGGER.error("CRITICAL ERROR: Internal BaseMod not found in JAR resources!");
+            return false;
+        }
+
+        try {
+            LuaManager.GLOBALS.load(script).call();
+            FLoader.LOGGER.info("BaseMod initialized.");
+            return true;
+        } catch (Exception e) {
+            FLoader.LOGGER.error("CRITICAL ERROR: Failed to initialize BaseMod: " + e.getMessage());
+            return false;
+        }
+    }
+
     public static void loadMods() {
         for (File modDir : Objects.requireNonNull(FolderManager.MODS_DIR.listFiles())) {
             parseMod(modDir);

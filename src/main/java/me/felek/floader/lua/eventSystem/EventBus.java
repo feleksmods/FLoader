@@ -16,6 +16,11 @@ public class EventBus {
         listeners.computeIfAbsent(eventName, list -> new LinkedList<>()).add(handler);
     }
 
+    public static void clear() {
+        listeners.clear();
+        FLoader.LOGGER.info("EventBus cleared.");
+    }
+
     public static void call(String eventName) {
         call(eventName, new Object[0]);
     }

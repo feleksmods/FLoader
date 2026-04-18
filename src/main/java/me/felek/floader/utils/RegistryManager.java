@@ -1,6 +1,7 @@
 package me.felek.floader.utils;
 
 import age.of.civilizations2.jakowski.lukasz.Image;
+import me.felek.floader.FLoader;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -12,6 +13,13 @@ public class RegistryManager {
     public static final Map<String, LuaFunction> commands = new HashMap<>();
     public static final Map<String, Image> resources = new HashMap<>();
     public static final List<String> customLoadingScreens = new ArrayList<>();
+
+    public static void clear() {
+        customLoadingTips.clear();
+        commands.clear();
+        customLoadingScreens.clear();
+        FLoader.LOGGER.info("Registry cleared.");
+    }
 
     public static void registerCommand(String commandName, LuaFunction func) {
         commands.put(commandName, func);

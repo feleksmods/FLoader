@@ -12,6 +12,7 @@ import me.felek.floader.lua.fl.unsafe.GetCFG;
 import me.felek.floader.lua.fl.utils.GetMonthName;
 import me.felek.floader.lua.fl.utils.GetTurnID;
 import me.felek.floader.lua.fl.utils.Log;
+import me.felek.floader.lua.fl.utils.ReloadFL;
 import me.felek.floader.lua.fl.world.*;
 import me.felek.floader.lua.utils.Binder;
 import me.felek.floader.utils.bonus.BonusType;
@@ -122,6 +123,7 @@ public class LuaManager {
         utilsModule.set("getMonthName", new GetMonthName());
         utilsModule.set("log", new Log());
         utilsModule.set("getTurnID", new GetTurnID());
+        utilsModule.set("reloadFL", new ReloadFL());
 
         GLOBALS.set("subscribe", new TwoArgFunction() {
             @Override

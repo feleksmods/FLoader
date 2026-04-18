@@ -3,8 +3,12 @@ package me.felek.floader;
 import javassist.*;
 import me.felek.floader.injection.Injected;
 import me.felek.floader.lua.LuaManager;
+import me.felek.floader.lua.eventSystem.EventBus;
+import me.felek.floader.mod.Mod;
 import me.felek.floader.mod.ModManager;
 import me.felek.floader.utils.FolderManager;
+import me.felek.floader.utils.RegistryManager;
+import me.felek.floader.utils.annos.Unsafe;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -106,8 +110,34 @@ public class FLoader {
         LOGGER.info("Initializing ModManager...");
         ModManager.init();
         LOGGER.info("ModManager initialized.");
+
+        LOGGER.info("Loading FLoader baseMod");
+        if (!ModManager.loadBaseMod()) {
+            LOGGER.fatal("FLoader FAILED TO START: BaseMod is missing!");
+            LOGGER.fatal("Check your JAR file integrity.");
+            System.exit(-1);
+        }
+        LOGGER.info("Base mod successfully loaded.");
+
         LOGGER.info("Loading mods...");
         ModManager.loadMods();
         LOGGER.info("Mods loaded.");
+    }
+
+    @Unsafe
+    public static void reload() {
+        LOGGER.info("Reloading FLoader...");
+        EventBus.clear();
+        RegistryManager.clear();
+        LuaManager.init();
+        ModManager.init();
+
+        LOGGER.info("Loading BaseMod during reload...");
+        if (ModManager.loadBaseMod()) {
+            LOGGER.info("Loading external mods during reload...");
+            ModManager.loadMods();
+        }
+
+        LOGGER.info("FLoader reloaded successfully!");
     }
 }

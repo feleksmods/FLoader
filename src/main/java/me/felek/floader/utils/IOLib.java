@@ -1,13 +1,9 @@
 package me.felek.floader.utils;
 
-import jdk.jfr.internal.LogLevel;
-import jdk.jfr.internal.Logger;
 import me.felek.floader.FLoader;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.Scanner;
 
 public class IOLib {
     public static String readAllText(File file) {
@@ -23,5 +19,16 @@ public class IOLib {
         }
 
         return sb.toString();
+    }
+
+    public static String readResourceText(String path) {
+        try (InputStream is = IOLib.class.getResourceAsStream(path)) {
+            if (is == null) return null;
+            try (Scanner s = new Scanner(is).useDelimiter("\\A")) {
+                return s.hasNext() ? s.next() : "";
+            }
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
