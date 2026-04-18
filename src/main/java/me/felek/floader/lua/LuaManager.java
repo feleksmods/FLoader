@@ -1,5 +1,6 @@
 package me.felek.floader.lua;
 
+import age.of.civilizations2.jakowski.lukasz.CFG;
 import me.felek.floader.FLoader;
 import me.felek.floader.lua.eventSystem.EventBus;
 import me.felek.floader.lua.fl.event.ShowAdvancedEvent;
@@ -12,6 +13,7 @@ import me.felek.floader.lua.fl.utils.GetMonthName;
 import me.felek.floader.lua.fl.utils.GetTurnID;
 import me.felek.floader.lua.fl.utils.Log;
 import me.felek.floader.lua.fl.world.*;
+import me.felek.floader.lua.utils.Binder;
 import me.felek.floader.utils.bonus.BonusType;
 import org.apache.logging.log4j.Level;
 import org.luaj.vm2.Globals;
@@ -38,7 +40,22 @@ public class LuaManager {
         LuaValue resModule = LuaValue.tableOf();
         LuaValue eventModule = LuaValue.tableOf();
         LuaValue bonus = LuaValue.tableOf();
-        //TODO: split worldModule to 3-4 modules
+        LuaValue settingsModule = LuaValue.tableOf();
+        //TODO: split worldModuleModule to 3-4 modules
+
+        Binder.bind(settingsModule, "FogOfWar", CFG.class, "FOG_OF_WAR");
+        Binder.bind(settingsModule, "SandBoxMode", CFG.class, "SANDBOX_MODE");
+        Binder.bind(settingsModule, "GuiScale", CFG.class, "GUI_SCALE");
+        Binder.bind(settingsModule, "TotalWarMode", CFG.class, "TOTAL_WARMODE");
+        Binder.bind(settingsModule, "LeadersCanDie", CFG.class, "LEADERS_CAN_DIE");
+        Binder.bind(settingsModule, "AgeOfChaos", CFG.class, "AGE_OF_CHAOS_MODE");
+        Binder.bind(settingsModule, "AgeOfChaosTurns", CFG.class, "AGE_OF_CHAOS_TURNS");
+        Binder.bind(settingsModule, "GameWidth", CFG.class, "GAMEWIDTH");
+        Binder.bind(settingsModule, "GameHeight", CFG.class, "GAMEHEIGHT");
+        Binder.bind(settingsModule, "ButtonH", CFG.class, "BUTTON_H");
+        Binder.bind(settingsModule, "ButtonW", CFG.class, "BUTTON_W");
+        Binder.bind(settingsModule, "Padding", CFG.class, "PADD");
+        Binder.bind(settingsModule, "Density", CFG.class, "DENSITY");
 
         for (BonusType type : BonusType.values())
             bonus.set(type.name(), LuaValue.valueOf(type.name()));
@@ -57,6 +74,16 @@ public class LuaManager {
         registryModule.set("registerIdeology", new RegisterIdeology());
 
         playerModule.set("getPlayerCiv", new GetPlayerCiv());
+
+        Binder.bind(worldModule, "PopulationGrowthRate", CFG.class, "POPULATION_GROWTH_RATE");
+        Binder.bind(worldModule, "EconomyGrowthRate", CFG.class, "ECONOMY_GROWTH_RATE");
+        Binder.bind(worldModule, "AssimilationSpeedModifier", CFG.class, "ASSIMILATION_SPEED_MODIFIER");
+        Binder.bind(worldModule, "AssimilationCostModifier", CFG.class, "ASSIMILATION_COST_MODIFIER");
+        Binder.bind(worldModule, "PeaceTreatyVictoryPointsModifier", CFG.class, "PEACE_TREATY_VICTORY_POINTS_MODIFIER");
+        Binder.bind(worldModule, "RebelsPower", CFG.class, "REBELS_POWER");
+        Binder.bind(worldModule, "PlunderModifier", CFG.class, "PLUNDER_MODIFIER");
+        Binder.bind(worldModule, "MovementPointsMaxModifier", CFG.class, "MOVEMENT_POINTS_MAX_MODIFIER");
+        
 
         worldModule.set("getCivMoney", new GetCivMoney());
         worldModule.set("setCivMoney", new SetCivMoney());
@@ -106,13 +133,14 @@ public class LuaManager {
         });
 
         fl.set("player", playerModule);
-        fl.set("world", worldModule);
+        fl.set("worldModule", worldModule);
         fl.set("utils", utilsModule);
         fl.set("registry", registryModule);
         fl.set("unsafe", unsafeModule);
         fl.set("res", resModule);
         fl.set("event", eventModule);
         fl.set("bonus", bonus);
+        fl.set("settings", settingsModule);
         GLOBALS.set("fl", fl);
     }
 }

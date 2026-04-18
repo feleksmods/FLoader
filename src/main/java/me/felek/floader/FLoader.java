@@ -88,11 +88,18 @@ public class FLoader {
     }
 
     public static void init() {
-        LOGGER.info("Starting FLoader");
+        LOGGER.info("Starting FLoader pre-init");
         LOGGER.info("Injecting agent");
         LOGGER.info("Checking folders...");
         FolderManager.checkAndCreate();
         LOGGER.info("Folders checked.");
+
+        LOGGER.info("FLoader pre-init done.");
+    }
+
+    public static void initModdingTools() {
+        if (LuaManager.GLOBALS != null) return;
+
         LOGGER.info("Initializing lua execution service");
         LuaManager.init();
         LOGGER.info("Lua execution service initialized.");
