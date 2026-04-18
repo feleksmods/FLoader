@@ -1,6 +1,5 @@
 package me.felek.floader.lua.fl.api;
 
-import me.felek.floader.mod.Mod;
 import me.felek.floader.mod.ModManager;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;

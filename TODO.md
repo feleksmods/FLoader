@@ -1,0 +1,16 @@
+# TODO list
+- [ ] Add Checking mod's and loader's version
+- [ ] Crash reports
+- [ ] Error and exit codes
+- [ ] Reloading resources in reload
+- [ ] Mod's tags
+- [ ] onProvinceClick event
+- [ ] onCivClick event
+- [ ] onCivDestroyed event
+- [ ] onBuildingBuild event
+- [ ] onTechLevelUp event
+- [ ] onCapitalCaptured event
+- [ ] onRebellionStart event
+- [ ] onNukeDropped event
+- [ ] nuke module
+- [ ] discord RPC?

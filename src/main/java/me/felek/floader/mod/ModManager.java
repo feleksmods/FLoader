@@ -10,9 +10,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ModManager {
     public static List<Mod> LOADED_MODS;
@@ -52,17 +50,24 @@ public class ModManager {
     }
 
     public static void loadMods() {
-        for (File modDir : Objects.requireNonNull(FolderManager.MODS_DIR.listFiles())) {
-            parseMod(modDir);
+        File[] files = FolderManager.MODS_DIR.listFiles();
+        if (files==null) return;
+
+        List<Mod> raw = new ArrayList<>();
+
+        for (File modDir : files) {
+            if (modDir.isDirectory()) {
+                Mod mod = parseModCfg(modDir);
+                if (mod != null) raw.add(mod);
+            }
         }
 
-        FLoader.LOGGER.info("Loaded " + LOADED_MODS.size() + " mods.");
-        FLoader.LOGGER.info("Starting initialize_mod function...");
-
+        LOADED_MODS = sortByDependencies(raw);
+        FLoader.LOGGER.info("Resolved load order for " + LOADED_MODS.size() + " mods");
         for (Mod mod : LOADED_MODS) {
             File script = new File(FolderManager.MODS_DIR, mod.name + "/scripts/" + mod.mainFile);
             if (!script.exists()) {
-                FLoader.LOGGER.error("Couldn't initialize_mod() call in " + mod.name + " because " + mod.mainFile + " is missing!");
+                FLoader.LOGGER.error("Couldn't find main file for " + mod.name);
                 continue;
             }
 
@@ -70,33 +75,62 @@ public class ModManager {
                 FLoader.LOGGER.info("Initializing " + mod.name + "...");
                 LuaManager.GLOBALS.loadfile(script.getAbsolutePath()).call();
             } catch (Exception e) {
-                FLoader.LOGGER.error("Couldn't initialize_mod() call in " + mod.name + " because " + e.getMessage());
+                FLoader.LOGGER.error("Error in " + mod.name + ": " + e.getMessage());
             }
         }
     }
 
-    private static void parseMod(File modDir) {
-        File cfgFile = new File(modDir, "config/config.json");
+    private static Mod parseModCfg(File dir) {
+        File cfg = new File(dir, "config/config.json");
 
-        if (!cfgFile.exists()) {
-            FLoader.LOGGER.error("Couldn't load mod " + modDir.getName() + " because config.json is missing!");
+        try {
+            String cfgContent = IOLib.readAllText(cfg);
+            Mod mod = gson.fromJson(cfgContent, Mod.class);
+            if (mod != null) return mod;
+        } catch (Exception exception) {
+            FLoader.LOGGER.error("Invalid config: " + dir.getName());
+        }
+
+        return null;
+    }
+
+    private static List<Mod> sortByDependencies(List<Mod> mods) {
+        List<Mod> sorted = new ArrayList<>();
+        Set<String> visited = new HashSet<>();
+        Set<String> loading = new HashSet<>();
+        Map<String, Mod> modMap = new HashMap<>();
+
+        for (Mod m : mods) modMap.put(m.name, m);
+        for (Mod m : mods) {
+            if (!visited.contains(m.name)) {
+                visit(m, modMap, visited, loading, sorted);
+            }
+        }
+        return sorted;
+    }
+
+    private static void visit(Mod mod, Map<String, Mod> allMods, Set<String> visited, Set<String> loading, List<Mod> sorted) {
+        if (loading.contains(mod.name)) {
+            FLoader.LOGGER.error("Cyclic dependency found: " + mod.name);
             return;
         }
 
-        try {
-            String cfgContent = IOLib.readAllText(cfgFile);
-
-            Mod mod = gson.fromJson(cfgContent, Mod.class);
-            if (mod == null || cfgContent == null) {
-                FLoader.LOGGER.error("Couldn't load mod " + modDir.getName() + " because config.json is invalid!");
-                return;
+        if (!visited.contains(mod.name)) {
+            loading.add(mod.name);
+            if (mod.dependencies != null) {
+                for (String depName : mod.dependencies) {
+                    Mod dep = allMods.get(depName);
+                    if (dep != null) {
+                        visit(dep, allMods, visited, loading, sorted);
+                    } else {
+                        FLoader.LOGGER.warn("Mod '" + mod.name + "' misses optional dependency: " + depName);
+                    }
+                }
             }
 
-            FLoader.LOGGER.info("Loading mod: " + mod.name + " v" + mod.version + " by " + mod.author);
-
-            LOADED_MODS.add(mod);
-        } catch (Exception exc) {
-            FLoader.LOGGER.error("Couldn't load mod " + modDir.getName() + " because config.json is invalid!");
+            loading.remove(mod.name);
+            visited.add(mod.name);
+            sorted.add(mod);
         }
     }
 }
