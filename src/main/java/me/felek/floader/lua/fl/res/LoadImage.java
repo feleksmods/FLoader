@@ -3,6 +3,7 @@ package me.felek.floader.lua.fl.res;
 import age.of.civilizations2.jakowski.lukasz.Image;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import me.felek.floader.utils.ExitCode;
 import me.felek.floader.utils.RegistryManager;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
@@ -16,10 +17,14 @@ public class LoadImage extends TwoArgFunction {
         File file = new File("fmods/" + modName.checkjstring() + "/assets/" + path.checkjstring());
 
         if (file.exists()) {
-            Texture tex = new Texture(Gdx.files.absolute(file.getAbsolutePath()));
-            Image img = new Image(tex, Texture.TextureFilter.Linear, Texture.TextureWrap.ClampToEdge);
-            RegistryManager.registerResource(key, img);
-            return LuaValue.valueOf(key);
+            try {
+                Texture tex = new Texture(Gdx.files.absolute(file.getAbsolutePath()));
+                Image img = new Image(tex, Texture.TextureFilter.Linear, Texture.TextureWrap.ClampToEdge);
+                RegistryManager.registerResource(key, img);
+                return LuaValue.valueOf(key);
+            } catch (Exception e) {
+                ExitCode.REG_IMAGE_LOAD_FAILED.throwFatalError("LibGDX failed to load texture: " + file.getAbsolutePath());
+            }
         }
         return NIL;
     }

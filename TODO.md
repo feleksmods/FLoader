@@ -1,7 +1,7 @@
 # TODO list
 - [ ] Add Checking mod's and loader's version
 - [ ] Crash reports
-- [ ] Error and exit codes
+- [ ] Add more exit codes
 - [ ] Reloading resources in reload
 - [ ] Mod's tags
 - [ ] onProvinceClick event

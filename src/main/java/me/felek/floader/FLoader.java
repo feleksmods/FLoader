@@ -6,6 +6,7 @@ import me.felek.floader.lua.LuaManager;
 import me.felek.floader.lua.eventSystem.EventBus;
 import me.felek.floader.mod.Mod;
 import me.felek.floader.mod.ModManager;
+import me.felek.floader.utils.ExitCode;
 import me.felek.floader.utils.FolderManager;
 import me.felek.floader.utils.RegistryManager;
 import me.felek.floader.utils.annos.Unsafe;
@@ -31,6 +32,10 @@ public class FLoader {
     private static Map<String, Injected> injections = new HashMap<>();
 
     public static void premain(String agentArgs, Instrumentation inst) {
+        if (inst == null) {
+            ExitCode.CORE_AGENT_ERROR.throwFatalError("Instrumentation instance is null.");
+        }
+
         registerInjections();
 
         inst.addTransformer(new ClassFileTransformer() {
@@ -51,8 +56,7 @@ public class FLoader {
                         LOGGER.info("Injected logic to: " + clname);
                         return cc.toBytecode();
                     } catch (Exception e) {
-                        LOGGER.error("Failed to inject into " + clname + ": " + e.getMessage());
-                        e.printStackTrace();
+                        ExitCode.CORE_TRANSFORMER_ERROR.throwFatalError("Class: " + clname + " | Exception: " + e.getMessage());
                     }
                 }
 

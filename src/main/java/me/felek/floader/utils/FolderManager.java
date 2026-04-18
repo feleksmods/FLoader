@@ -10,7 +10,9 @@ public class FolderManager {
     public static void checkAndCreate() {
         if (!MODS_DIR.exists()) {
             FLoader.LOGGER.warn("Mods folder does not exist. Creating...");
-            MODS_DIR.mkdir();
+            if (!MODS_DIR.mkdirs()) {
+                ExitCode.CORE_FOLDER_ERROR.throwFatalError("Failed to create directory: " + MODS_DIR.getAbsolutePath());
+            }
             FLoader.LOGGER.warn("Mods folder created.");
         }
     }

@@ -1,6 +1,7 @@
 package me.felek.floader.lua.utils;
 
 import me.felek.floader.FLoader;
+import me.felek.floader.utils.ExitCode;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
@@ -42,8 +43,10 @@ public class Binder {
                     return NIL;
                 }
             });
+        } catch (NoSuchFieldException e) {
+            ExitCode.CORE_REFLECTION_ERROR.throwFatalError("Field '" + fieldName + "' not found in game class. Modding API is outdated!");
         } catch (Exception exc) {
-            FLoader.LOGGER.error("Failed to bind field: " + target.toString() + "." + fieldName);
+            ExitCode.LUA_BINDING_ERROR.throwFatalError("Failed to bind " + luaName + " | Error: " + exc.getMessage());
         }
     }
 }

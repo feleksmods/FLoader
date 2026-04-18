@@ -3,6 +3,7 @@ package me.felek.floader.mod;
 import com.google.gson.Gson;
 import me.felek.floader.FLoader;
 import me.felek.floader.lua.LuaManager;
+import me.felek.floader.utils.ExitCode;
 import me.felek.floader.utils.FolderManager;
 import me.felek.floader.utils.IOLib;
 
@@ -35,7 +36,7 @@ public class ModManager {
         String script = IOLib.readResourceText("/floader/scripts/script.lua");
 
         if (script == null || script.isEmpty()) {
-            FLoader.LOGGER.error("CRITICAL ERROR: Internal BaseMod not found in JAR resources!");
+            ExitCode.LUA_BASE_MOD_MISSING.throwFatalError("Internal BaseMod (script.lua) was not found inside the JAR!");
             return false;
         }
 
@@ -44,7 +45,7 @@ public class ModManager {
             FLoader.LOGGER.info("BaseMod initialized.");
             return true;
         } catch (Exception e) {
-            FLoader.LOGGER.error("CRITICAL ERROR: Failed to initialize BaseMod: " + e.getMessage());
+            ExitCode.LUA_BASE_MOD_CRASH.throwFatalError("BaseMod runtime error: " + e.getMessage());
             return false;
         }
     }
@@ -67,8 +68,7 @@ public class ModManager {
         for (Mod mod : LOADED_MODS) {
             File script = new File(FolderManager.MODS_DIR, mod.name + "/scripts/" + mod.mainFile);
             if (!script.exists()) {
-                FLoader.LOGGER.error("Couldn't find main file for " + mod.name);
-                continue;
+                ExitCode.MOD_MAIN_SCRIPT_MISSING.throwFatalError("Mod: " + mod.name + " | Missing file: " + script.getAbsolutePath());//TODO: check, maybe this is not critical error
             }
 
             try {
@@ -111,8 +111,7 @@ public class ModManager {
 
     private static void visit(Mod mod, Map<String, Mod> allMods, Set<String> visited, Set<String> loading, List<Mod> sorted) {
         if (loading.contains(mod.name)) {
-            FLoader.LOGGER.error("Cyclic dependency found: " + mod.name);
-            return;
+            ExitCode.MOD_CYCLIC_DEPENDENCY.throwFatalError("Circular dependency detected at mod: " + mod.name);
         }
 
         if (!visited.contains(mod.name)) {
