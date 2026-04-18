@@ -3,6 +3,10 @@ package me.felek.floader.lua;
 import age.of.civilizations2.jakowski.lukasz.CFG;
 import me.felek.floader.FLoader;
 import me.felek.floader.lua.eventSystem.EventBus;
+import me.felek.floader.lua.fl.api.GetLoaderName;
+import me.felek.floader.lua.fl.api.GetLoaderVersion;
+import me.felek.floader.lua.fl.api.GetModInfo;
+import me.felek.floader.lua.fl.api.GetModsList;
 import me.felek.floader.lua.fl.event.ShowAdvancedEvent;
 import me.felek.floader.lua.fl.event.ShowBasicEvent;
 import me.felek.floader.lua.fl.player.GetPlayerCiv;
@@ -42,7 +46,13 @@ public class LuaManager {
         LuaValue eventModule = LuaValue.tableOf();
         LuaValue bonus = LuaValue.tableOf();
         LuaValue settingsModule = LuaValue.tableOf();
+        LuaValue api = LuaValue.tableOf();
         //TODO: split worldModuleModule to 3-4 modules
+
+        api.set("getModsList", new GetModsList());
+        api.set("getModInfo", new GetModInfo());
+        api.set("getLoaderVersion", new GetLoaderVersion());
+        api.set("getLoaderName", new GetLoaderName());
 
         Binder.bind(settingsModule, "FogOfWar", CFG.class, "FOG_OF_WAR");
         Binder.bind(settingsModule, "SandBoxMode", CFG.class, "SANDBOX_MODE");
@@ -142,6 +152,7 @@ public class LuaManager {
         fl.set("res", resModule);
         fl.set("event", eventModule);
         fl.set("bonus", bonus);
+        fl.set("api", api);
         fl.set("settings", settingsModule);
         GLOBALS.set("fl", fl);
     }

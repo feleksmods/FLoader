@@ -22,6 +22,16 @@ public class ModManager {
         LOADED_MODS = new ArrayList<>();
     }
 
+    public static Mod getModByName(String name) {
+         for (Mod mod : LOADED_MODS) {
+             if (mod.name.equals(name)) {
+                 return mod;
+             }
+         }
+
+         return null;
+    }
+
     public static boolean loadBaseMod() {
         FLoader.LOGGER.info("Loading internal BaseMod");
         String script = IOLib.readResourceText("/floader/scripts/script.lua");
