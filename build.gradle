@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+group = 'me.felek.fenix'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.javassist:javassist:3.29.2-GA'
+
+    implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
+    implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
+    implementation 'com.google.guava:guava:31.1-jre'
+    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'org.luaj:luaj-jse:3.0.1'
+
+    implementation files('libs/game.jar')
+}
+
+jar {
+    manifest {
+        attributes(
+                'Premain-Class': 'me.felek.floader.FLoader',
+                'Can-Retransform-Classes': 'true',
+                'Can-Redefine-Classes': 'true'
+        )
+    }
+}
+
+shadowJar {
+    archiveFileName.set('FLoader.jar')
+}

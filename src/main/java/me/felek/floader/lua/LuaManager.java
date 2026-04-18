@@ -1,0 +1,118 @@
+package me.felek.floader.lua;
+
+import me.felek.floader.FLoader;
+import me.felek.floader.lua.eventSystem.EventBus;
+import me.felek.floader.lua.fl.event.ShowAdvancedEvent;
+import me.felek.floader.lua.fl.event.ShowBasicEvent;
+import me.felek.floader.lua.fl.player.GetPlayerCiv;
+import me.felek.floader.lua.fl.registry.*;
+import me.felek.floader.lua.fl.res.LoadImage;
+import me.felek.floader.lua.fl.unsafe.GetCFG;
+import me.felek.floader.lua.fl.utils.GetMonthName;
+import me.felek.floader.lua.fl.utils.GetTurnID;
+import me.felek.floader.lua.fl.utils.Log;
+import me.felek.floader.lua.fl.world.*;
+import me.felek.floader.utils.bonus.BonusType;
+import org.apache.logging.log4j.Level;
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaFunction;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.TwoArgFunction;
+import org.luaj.vm2.lib.jse.JsePlatform;
+
+public class LuaManager {
+    public static Globals GLOBALS;
+
+    public static void init() {
+        FLoader.LOGGER.log(Level.INFO, "Initializing LuaManager");
+
+        GLOBALS = JsePlatform.standardGlobals();
+
+        LuaValue fl = LuaValue.tableOf();
+
+        LuaValue playerModule = LuaValue.tableOf();
+        LuaValue worldModule =  LuaValue.tableOf();
+        LuaValue utilsModule = LuaValue.tableOf();
+        LuaValue registryModule = LuaValue.tableOf();
+        LuaValue unsafeModule = LuaValue.tableOf();
+        LuaValue resModule = LuaValue.tableOf();
+        LuaValue eventModule = LuaValue.tableOf();
+        LuaValue bonus = LuaValue.tableOf();
+        //TODO: split worldModule to 3-4 modules
+
+        for (BonusType type : BonusType.values())
+            bonus.set(type.name(), LuaValue.valueOf(type.name()));
+
+        eventModule.set("showEvent", new ShowBasicEvent());
+        eventModule.set("showAdvancedEvent", new ShowAdvancedEvent());
+
+        resModule.set("loadImage", new LoadImage());
+
+        unsafeModule.set("getCFG", new GetCFG());
+
+        registryModule.set("registerCustomLoadingTip", new AddCustomLoadingTip());
+        registryModule.set("registerCommand", new RegisterCommand());
+        registryModule.set("registerCustomLoadingScreen", new RegisterCustomLoadingScreen());
+        registryModule.set("registerReligion", new RegisterCustomReligion());
+        registryModule.set("registerIdeology", new RegisterIdeology());
+
+        playerModule.set("getPlayerCiv", new GetPlayerCiv());
+
+        worldModule.set("getCivMoney", new GetCivMoney());
+        worldModule.set("setCivMoney", new SetCivMoney());
+        worldModule.set("getCivName", new GetCivName());
+        worldModule.set("getCivTag", new GetCivTag());
+        worldModule.set("getProvincesCount", new GetProvincesCount());
+        worldModule.set("getCapitalId", new GetCapitalId());
+        worldModule.set("getCivRank", new GetCivRank());
+        worldModule.set("getCivTechLevel", new GetCivTechLevel());
+        worldModule.set("getDiploPoints", new GetDiploPoints());
+        worldModule.set("getProvinceOwner", new GetProvinceOwner());
+        worldModule.set("isCapital", new IsCapital());
+        worldModule.set("setProvinceOwner", new SetProvinceOwner());
+        worldModule.set("getProvinceStability", new GetProvinceStability());
+        worldModule.set("getProvinceHappiness", new GetProvinceHappiness());
+        worldModule.set("getProvinceArmy", new GetProvinceArmy());
+        worldModule.set("getProvinceEconomy", new GetProvinceEconomy());
+        worldModule.set("getProvincePopulation", new GetProvincePopulation());
+        worldModule.set("isAlly", new IsAlly());
+        worldModule.set("getTruceTurns", new GetTruceTurns());
+        worldModule.set("declareWar", new DeclareWar());
+        worldModule.set("getCivsAtWar", new GetCivsAtWar());
+        worldModule.set("setRelation", new SetRelation());
+        worldModule.set("getRelation", new GetRelation());
+        worldModule.set("setArmyExpertiseDefense", new SetArmyExpertiseDefense());
+        worldModule.set("setArmyExpertiseAttack", new SetArmyExpertiseAttack());
+        worldModule.set("getArmyExpertiseDefence", new GetArmyExpertiseDefense());
+        worldModule.set("getArmyExpertiseAttack", new GetArmyExpertiseAttack());
+        worldModule.set("getMilitaryExpertise", new GetMilitaryExpertise());
+        worldModule.set("getCivCasualties", new GetCivCasualties());
+        worldModule.set("recruitArmy", new RecruitArmy());
+        worldModule.set("setCivIdeology", new SetCivIdeology());
+        worldModule.set("getCivIdeology", new GetCivIdeology());
+        worldModule.set("getMovementPoints", new GetMovementPoints());
+
+        utilsModule.set("getMonthName", new GetMonthName());
+        utilsModule.set("log", new Log());
+        utilsModule.set("getTurnID", new GetTurnID());
+
+        GLOBALS.set("subscribe", new TwoArgFunction() {
+            @Override
+            public LuaValue call(LuaValue luaValue, LuaValue luaValue1) {
+                EventBus.subscribe(luaValue.tojstring(), (LuaFunction) luaValue1);
+                FLoader.LOGGER.info("Registered new " + luaValue.tojstring() + " event");
+                return NIL;
+            }
+        });
+
+        fl.set("player", playerModule);
+        fl.set("world", worldModule);
+        fl.set("utils", utilsModule);
+        fl.set("registry", registryModule);
+        fl.set("unsafe", unsafeModule);
+        fl.set("res", resModule);
+        fl.set("event", eventModule);
+        fl.set("bonus", bonus);
+        GLOBALS.set("fl", fl);
+    }
+}
