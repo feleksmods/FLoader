@@ -95,6 +95,10 @@ public class FLoader {
 
         injections.put("age.of.civilizations2.jakowski.lukasz.Console.Commands", new CommandsInject());
         injections.put("age.of.civilizations2.jakowski.lukasz.AoCGame", new AoCGameInject());
+
+        injections.put("age.of.civilizations2.jakowski.lukasz.TouchManager", new TouchInject());
+        injections.put("age.of.civilizations2.jakowski.lukasz.Civilization", new CivilizationInject());
+        injections.put("age.of.civilizations2.jakowski.lukasz.Province", new ProvinceInject());
     }
 
     public static void init() {
