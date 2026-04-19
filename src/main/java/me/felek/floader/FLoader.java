@@ -4,6 +4,7 @@ import age.of.civilizations2.jakowski.lukasz.AoCGame;
 import com.codedisaster.steamworks.SteamAPI;
 import javassist.*;
 import me.felek.floader.injection.AoCGameInject;
+import me.felek.floader.injection.GameManagerInject;
 import me.felek.floader.injection.Injected;
 import me.felek.floader.lua.LuaManager;
 import me.felek.floader.lua.eventSystem.EventBus;
@@ -101,6 +102,7 @@ public class FLoader {
         injections.put("age.of.civilizations2.jakowski.lukasz.TouchManager", new TouchInject());
         injections.put("age.of.civilizations2.jakowski.lukasz.Civilization", new CivilizationInject());
         injections.put("age.of.civilizations2.jakowski.lukasz.Province", new ProvinceInject());
+        injections.put("age.of.civilizations2.jakowski.lukasz.GameManager", new GameManagerInject());
     }
 
     public static void init() {

@@ -10,10 +10,7 @@ import me.felek.floader.lua.fl.player.GetPlayerCiv;
 import me.felek.floader.lua.fl.registry.*;
 import me.felek.floader.lua.fl.res.LoadImage;
 import me.felek.floader.lua.fl.unsafe.GetCFG;
-import me.felek.floader.lua.fl.utils.GetMonthName;
-import me.felek.floader.lua.fl.utils.GetTurnID;
-import me.felek.floader.lua.fl.utils.Log;
-import me.felek.floader.lua.fl.utils.ReloadFL;
+import me.felek.floader.lua.fl.utils.*;
 import me.felek.floader.lua.fl.world.*;
 import me.felek.floader.lua.steam.*;
 import me.felek.floader.lua.utils.Binder;
@@ -137,6 +134,9 @@ public class LuaManager {
         worldModule.set("setCivIdeology", new SetCivIdeology());
         worldModule.set("getCivIdeology", new GetCivIdeology());
         worldModule.set("getMovementPoints", new GetMovementPoints());
+        worldModule.set("createMission", new CreateMission());
+        worldModule.set("dropNuke", new DropNuke());
+        worldModule.set("setCivNukes", new SetCivNukes());
 
         utilsModule.set("getMonthName", new GetMonthName());
         utilsModule.set("log", new Log());
