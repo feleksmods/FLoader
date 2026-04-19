@@ -1,5 +1,7 @@
 package me.felek.floader;
 
+import age.of.civilizations2.jakowski.lukasz.AoCGame;
+import com.codedisaster.steamworks.SteamAPI;
 import javassist.*;
 import me.felek.floader.injection.AoCGameInject;
 import me.felek.floader.injection.Injected;

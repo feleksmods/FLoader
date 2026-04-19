@@ -3,10 +3,7 @@ package me.felek.floader.lua;
 import age.of.civilizations2.jakowski.lukasz.CFG;
 import me.felek.floader.FLoader;
 import me.felek.floader.lua.eventSystem.EventBus;
-import me.felek.floader.lua.fl.api.GetLoaderName;
-import me.felek.floader.lua.fl.api.GetLoaderVersion;
-import me.felek.floader.lua.fl.api.GetModInfo;
-import me.felek.floader.lua.fl.api.GetModsList;
+import me.felek.floader.lua.fl.api.*;
 import me.felek.floader.lua.fl.event.ShowAdvancedEvent;
 import me.felek.floader.lua.fl.event.ShowBasicEvent;
 import me.felek.floader.lua.fl.player.GetPlayerCiv;
@@ -18,11 +15,11 @@ import me.felek.floader.lua.fl.utils.GetTurnID;
 import me.felek.floader.lua.fl.utils.Log;
 import me.felek.floader.lua.fl.utils.ReloadFL;
 import me.felek.floader.lua.fl.world.*;
+import me.felek.floader.lua.steam.*;
 import me.felek.floader.lua.utils.Binder;
 import me.felek.floader.utils.bonus.BonusType;
 import org.apache.logging.log4j.Level;
 import org.luaj.vm2.Globals;
-import org.luaj.vm2.Lua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
@@ -49,6 +46,7 @@ public class LuaManager {
         LuaValue settingsModule = LuaValue.tableOf();
         LuaValue api = LuaValue.tableOf();
         LuaValue keys = LuaValue.tableOf();
+        LuaValue steam = LuaValue.tableOf();
 
         GenerateKeys.generate(keys);
 
@@ -56,6 +54,13 @@ public class LuaManager {
         api.set("getModInfo", new GetModInfo());
         api.set("getLoaderVersion", new GetLoaderVersion());
         api.set("getLoaderName", new GetLoaderName());
+
+        steam.set("grantAchievement", new GrantSteamAchievement());
+        steam.set("setRichPresence", new SetRichPresence());
+        steam.set("getPlaytime", new GetPlayTime());
+        steam.set("getSteamName", new GetSteamName());
+        steam.set("openSteamUrl", new OpenSteamUrl());
+        steam.set("openSteamOverlay", new OpenSteamUrl());
 
         Binder.bind(settingsModule, "FogOfWar", CFG.class, "FOG_OF_WAR");
         Binder.bind(settingsModule, "SandBoxMode", CFG.class, "SANDBOX_MODE");
@@ -98,7 +103,6 @@ public class LuaManager {
         Binder.bind(worldModule, "RebelsPower", CFG.class, "REBELS_POWER");
         Binder.bind(worldModule, "PlunderModifier", CFG.class, "PLUNDER_MODIFIER");
         Binder.bind(worldModule, "MovementPointsMaxModifier", CFG.class, "MOVEMENT_POINTS_MAX_MODIFIER");
-        
 
         worldModule.set("getCivMoney", new GetCivMoney());
         worldModule.set("setCivMoney", new SetCivMoney());
@@ -159,6 +163,7 @@ public class LuaManager {
         fl.set("keys", keys);
         fl.set("api", api);
         fl.set("settings", settingsModule);
+        fl.set("steam", steam);
         GLOBALS.set("fl", fl);
     }
 }
