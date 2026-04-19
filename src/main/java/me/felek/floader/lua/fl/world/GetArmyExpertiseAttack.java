@@ -8,13 +8,11 @@ import org.luaj.vm2.lib.OneArgFunction;
 public class GetArmyExpertiseAttack extends OneArgFunction {
     @Override
     public LuaValue call(LuaValue arg) {
-        int id = arg.checkint();
-        if (id < 0 || id >= CFG.core.getCivsSize()) {
-            ExitCode.WORLD_CIV_INVALID_ID.throwFatalError("ID: " + id + " | Max Civs: " + CFG.core.getCivsSize());
+        if (CFG.core == null) ExitCode.UNSAFE_CFG_ACCESS_ERROR.throwFatalError("CFG.core is NULL");
+        if (arg.checkint() < 0 || arg.checkint() >= CFG.core.getCivsSize()) {
+            ExitCode.WORLD_CIV_INVALID_ID.throwFatalError("CivID " + arg.checkint() + " out of [0-" + (CFG.core.getCivsSize()-1) + "]");
         }
-        if (CFG.core.getCiv(id).civGD == null) {
-            ExitCode.WORLD_CIV_DATA_CORRUPT.throwFatalError("civGD (GameData) for CivID " + id + " is null. Save file corrupt?");
-        }
+        if (CFG.core.getCiv(arg.checkint()) == null) ExitCode.WORLD_CIV_NULL.throwFatalError("Civ object at " + arg.checkint() + " is null");
         return LuaValue.valueOf(CFG.core.getCiv(arg.checkint()).civGD.armyExpertiseAttack);
     }
 }

@@ -4,13 +4,6 @@
 - [ ] Add more exit codes
 - [ ] Reloading resources in reload
 - [ ] Mod's tags
-- [ ] onProvinceClick event
-- [ ] onCivClick event
-- [ ] onCivDestroyed event
-- [ ] onBuildingBuild event
-- [ ] onTechLevelUp event
-- [ ] onCapitalCaptured event
-- [ ] onRebellionStart event
-- [ ] onNukeDropped event
+- [ ] Port all AoH2: DE BuiltIn events
 - [ ] nuke module
 - [ ] discord RPC?

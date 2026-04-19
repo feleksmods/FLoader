@@ -47,7 +47,6 @@ public class LuaManager {
         LuaValue bonus = LuaValue.tableOf();
         LuaValue settingsModule = LuaValue.tableOf();
         LuaValue api = LuaValue.tableOf();
-        //TODO: split worldModuleModule to 3-4 modules
 
         api.set("getModsList", new GetModsList());
         api.set("getModInfo", new GetModInfo());

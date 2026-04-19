@@ -4,7 +4,6 @@ import javassist.*;
 import me.felek.floader.injection.Injected;
 import me.felek.floader.lua.LuaManager;
 import me.felek.floader.lua.eventSystem.EventBus;
-import me.felek.floader.mod.Mod;
 import me.felek.floader.mod.ModManager;
 import me.felek.floader.utils.ExitCode;
 import me.felek.floader.utils.FolderManager;

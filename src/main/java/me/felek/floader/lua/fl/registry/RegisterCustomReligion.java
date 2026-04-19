@@ -1,6 +1,7 @@
 package me.felek.floader.lua.fl.registry;
 
 import age.of.civilizations2.jakowski.lukasz.*;
+import me.felek.floader.utils.ExitCode;
 import me.felek.floader.utils.RegistryManager;
 import me.felek.floader.utils.bonus.BonusParser;
 import org.luaj.vm2.LuaTable;
@@ -19,7 +20,7 @@ public class RegisterCustomReligion extends VarArgFunction {
         String imgKey = args.arg(4).optjstring("");
 
         if (CFG.religionManager == null) {
-            CFG.religionManager = new ReligionManager();
+            ExitCode.UNSAFE_CFG_ACCESS_ERROR.throwFatalError("ReligionManager is null during registration");
         }
         if (CFG.religionManager.lReligions == null) {
             CFG.religionManager.lReligions = new ArrayList<>();
@@ -33,7 +34,11 @@ public class RegisterCustomReligion extends VarArgFunction {
                 (float)colorTab.get(3).optdouble(255.0) / 255.0f
         };
 
-        BonusParser.apply(rel, bonusesTable);
+        try {
+            BonusParser.apply(rel, bonusesTable);
+        } catch (Exception e) {
+            ExitCode.LUA_BINDING_ERROR.throwFatalError("Failed to apply religion bonuses: " + e.getMessage());
+        }
         CFG.religionManager.lReligions.add(rel);
         Image icon = null;
         if (!imgKey.isEmpty() && RegistryManager.resources.containsKey(imgKey)) {

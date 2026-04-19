@@ -22,7 +22,10 @@ public class RegistryManager {
     }
 
     public static void registerCommand(String commandName, LuaFunction func) {
-        commands.put(commandName, func);
+        if (commands.containsKey(commandName.toLowerCase())) {
+            ExitCode.REG_COMMAND_ERROR.throwFatalError("Command duplicate: " + commandName);
+        }
+        commands.put(commandName.toLowerCase(), func);
     }
 
     public static void registerLoadingScreen(String resourceKey) {
@@ -31,7 +34,11 @@ public class RegistryManager {
         }
     }
 
+
     public static void registerResource(String key, Image img) {
+        if (resources.containsKey(key)) {
+            ExitCode.REG_RESOURCE_DUPLICATE.throwFatalError("Resource collision: " + key);
+        }
         resources.put(key, img);
     }
 
