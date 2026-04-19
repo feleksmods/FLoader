@@ -22,6 +22,7 @@ import me.felek.floader.lua.utils.Binder;
 import me.felek.floader.utils.bonus.BonusType;
 import org.apache.logging.log4j.Level;
 import org.luaj.vm2.Globals;
+import org.luaj.vm2.Lua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
@@ -47,6 +48,9 @@ public class LuaManager {
         LuaValue bonus = LuaValue.tableOf();
         LuaValue settingsModule = LuaValue.tableOf();
         LuaValue api = LuaValue.tableOf();
+        LuaValue keys = LuaValue.tableOf();
+
+        GenerateKeys.generate(keys);
 
         api.set("getModsList", new GetModsList());
         api.set("getModInfo", new GetModInfo());
@@ -82,6 +86,7 @@ public class LuaManager {
         registryModule.set("registerCustomLoadingScreen", new RegisterCustomLoadingScreen());
         registryModule.set("registerReligion", new RegisterCustomReligion());
         registryModule.set("registerIdeology", new RegisterIdeology());
+        registryModule.set("registerBind", new RegisterKeybind());
 
         playerModule.set("getPlayerCiv", new GetPlayerCiv());
 
@@ -151,6 +156,7 @@ public class LuaManager {
         fl.set("res", resModule);
         fl.set("event", eventModule);
         fl.set("bonus", bonus);
+        fl.set("keys", keys);
         fl.set("api", api);
         fl.set("settings", settingsModule);
         GLOBALS.set("fl", fl);

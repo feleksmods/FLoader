@@ -1,12 +1,14 @@
 package me.felek.floader;
 
 import javassist.*;
+import me.felek.floader.injection.AoCGameInject;
 import me.felek.floader.injection.Injected;
 import me.felek.floader.lua.LuaManager;
 import me.felek.floader.lua.eventSystem.EventBus;
 import me.felek.floader.mod.ModManager;
 import me.felek.floader.utils.ExitCode;
 import me.felek.floader.utils.FolderManager;
+import me.felek.floader.utils.KeybindManager;
 import me.felek.floader.utils.RegistryManager;
 import me.felek.floader.utils.annos.Unsafe;
 import org.apache.logging.log4j.LogManager;
@@ -92,6 +94,7 @@ public class FLoader {
         injections.put("age.of.civilizations2.jakowski.lukasz.Menus.ActionInfo.Menu_InGame_ActionInfo_TreasuryIsEmpty", new MenuInGameActionInfoTreasureIsEmptyInject());
 
         injections.put("age.of.civilizations2.jakowski.lukasz.Console.Commands", new CommandsInject());
+        injections.put("age.of.civilizations2.jakowski.lukasz.AoCGame", new AoCGameInject());
     }
 
     public static void init() {
@@ -134,6 +137,7 @@ public class FLoader {
         RegistryManager.clear();
         LuaManager.init();
         ModManager.init();
+        KeybindManager.clear();
 
         LOGGER.info("Loading BaseMod during reload...");
         if (ModManager.loadBaseMod()) {

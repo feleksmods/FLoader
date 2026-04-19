@@ -12,6 +12,7 @@ public enum ExitCode {//TODO: Implement all codes and add some new codes
     LUA_BASE_MOD_MISSING(-22, "Internal BaseMod script not found in JAR."),
     LUA_BASE_MOD_CRASH(-23, "Critical error in BaseMod logic execution."),
     LUA_BINDING_ERROR(-24, "Failed to bind Java method to Lua space."),
+    LUA_RUNTIME_ERROR(-25, "Mod logic execution failed during runtime."),
 
     MOD_CONFIG_CORRUPT(-31, "config.json is invalid or missing in a mod folder."),
     MOD_CYCLIC_DEPENDENCY(-32, "Circular dependency detected between mods."),
