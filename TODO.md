@@ -7,3 +7,4 @@
 - [ ] Port all AoH2: DE BuiltIn events
 - [ ] nuke module
 - [ ] discord RPC?
+- [ ] rename?

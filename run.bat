@@ -1,0 +1,1 @@
+java -javaagent:FLoader.jar -jar "game.jar"

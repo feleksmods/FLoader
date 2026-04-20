@@ -153,7 +153,7 @@ public class LuaManager {
         });
 
         fl.set("player", playerModule);
-        fl.set("worldModule", worldModule);
+        fl.set("world", worldModule);
         fl.set("utils", utilsModule);
         fl.set("registry", registryModule);
         fl.set("unsafe", unsafeModule);
