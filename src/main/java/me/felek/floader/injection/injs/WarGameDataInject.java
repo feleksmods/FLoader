@@ -1,9 +1,9 @@
 package me.felek.floader.injection.injs;
 
 import javassist.*;
-import me.felek.floader.injection.Injected;
+import me.felek.floader.injection.Injection;
 
-public class WarGameDataInject implements Injected {
+public class WarGameDataInject implements Injection {
     @Override
     public void inject(ClassPool pool, String clname) throws NotFoundException, CannotCompileException {
         CtClass cc = pool.get(clname);

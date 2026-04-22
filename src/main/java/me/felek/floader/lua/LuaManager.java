@@ -4,6 +4,7 @@ import age.of.civilizations2.jakowski.lukasz.CFG;
 import me.felek.floader.FLoader;
 import me.felek.floader.lua.eventSystem.EventBus;
 import me.felek.floader.lua.fl.api.*;
+import me.felek.floader.lua.fl.audio.AddStation;
 import me.felek.floader.lua.fl.event.ShowAdvancedEvent;
 import me.felek.floader.lua.fl.event.ShowBasicEvent;
 import me.felek.floader.lua.fl.player.GetPlayerCiv;
@@ -45,6 +46,9 @@ public class LuaManager {
         LuaValue api = LuaValue.tableOf();
         LuaValue keys = LuaValue.tableOf();
         LuaValue steam = LuaValue.tableOf();
+        LuaValue audio = LuaValue.tableOf();
+
+        audio.set("addStation", new AddStation());
 
         GenerateKeys.generate(keys);
 
@@ -164,6 +168,7 @@ public class LuaManager {
         fl.set("utils", utilsModule);
         fl.set("registry", registryModule);
         fl.set("unsafe", unsafeModule);
+        fl.set("audio", audio);
         fl.set("res", resModule);
         fl.set("event", eventModule);
         fl.set("bonus", bonus);

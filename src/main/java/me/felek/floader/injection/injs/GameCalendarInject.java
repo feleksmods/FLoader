@@ -2,9 +2,9 @@ package me.felek.floader.injection.injs;
 
 import javassist.*;
 import javassist.expr.ExprEditor;
-import me.felek.floader.injection.Injected;
+import me.felek.floader.injection.Injection;
 
-public class GameCalendarInject implements Injected {
+public class GameCalendarInject implements Injection {
     @Override
     public void inject(ClassPool pool, String clname) throws NotFoundException, CannotCompileException {
         CtClass cc = pool.get(clname);

@@ -2,7 +2,7 @@ package me.felek.floader.injection;
 
 import javassist.*;
 
-public class AoCGameInject implements Injected{
+public class AoCGameInject implements Injection {
     @Override
     public void inject(ClassPool pool, String clname) throws NotFoundException, CannotCompileException {
         javassist.CtClass cc = pool.get(clname);

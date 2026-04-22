@@ -1,11 +1,9 @@
 package me.felek.floader;
 
-import age.of.civilizations2.jakowski.lukasz.AoCGame;
-import com.codedisaster.steamworks.SteamAPI;
 import javassist.*;
 import me.felek.floader.injection.AoCGameInject;
 import me.felek.floader.injection.GameManagerInject;
-import me.felek.floader.injection.Injected;
+import me.felek.floader.injection.Injection;
 import me.felek.floader.lua.LuaManager;
 import me.felek.floader.lua.eventSystem.EventBus;
 import me.felek.floader.mod.ModManager;
@@ -33,7 +31,7 @@ public class FLoader {
 
     public static final Logger LOGGER = LogManager.getLogger(FLoader.class);
 
-    private static Map<String, Injected> injections = new HashMap<>();
+    private static Map<String, Injection> injections = new HashMap<>();
 
     public static void premain(String agentArgs, Instrumentation inst) {
         if (inst == null) {
@@ -52,7 +50,7 @@ public class FLoader {
                         pool.appendClassPath(new LoaderClassPath(loader));
                         pool.insertClassPath(new ByteArrayClassPath(clname, classfileBuffer));
 
-                        Injected injector = injections.get(clname);
+                        Injection injector = injections.get(clname);
                         CtClass cc = pool.get(clname);
 
                         injector.inject(pool, clname);
@@ -103,6 +101,9 @@ public class FLoader {
         injections.put("age.of.civilizations2.jakowski.lukasz.Civilization", new CivilizationInject());
         injections.put("age.of.civilizations2.jakowski.lukasz.Province", new ProvinceInject());
         injections.put("age.of.civilizations2.jakowski.lukasz.GameManager", new GameManagerInject());
+
+        injections.put("age.of.civilizations2.jakowski.lukasz.Files.FileManager", new FileManagerInject());
+        injections.put("age.of.civilizations2.jakowski.lukasz.SFXManager", new SFXManagerInject());
     }
 
     public static void init() {

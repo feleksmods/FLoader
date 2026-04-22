@@ -1,9 +1,9 @@
 package me.felek.floader.injection.injs;
 
 import javassist.*;
-import me.felek.floader.injection.Injected;
+import me.felek.floader.injection.Injection;
 
-public class ReligionManagerInject implements Injected {
+public class ReligionManagerInject implements Injection {
     @Override
     public void inject(ClassPool pool, String clname) throws CannotCompileException, NotFoundException {
         CtClass cc = pool.get(clname);

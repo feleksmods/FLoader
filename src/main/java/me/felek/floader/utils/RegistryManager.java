@@ -13,6 +13,11 @@ public class RegistryManager {
     public static final Map<String, LuaFunction> commands = new HashMap<>();
     public static final Map<String, Image> resources = new HashMap<>();
     public static final List<String> customLoadingScreens = new ArrayList<>();
+    public static Map<String, List<String>> customStations = new HashMap<>();
+
+    public static void registerStation(String name, List<String> tracks) {
+        customStations.put(name, tracks);
+    }
 
     public static void clear() {
         customLoadingTips.clear();

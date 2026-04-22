@@ -1,6 +1,8 @@
 package me.felek.floader.utils;
 
 import me.felek.floader.FLoader;
+import me.felek.floader.mod.Mod;
+import me.felek.floader.mod.ModManager;
 
 import java.io.File;
 
@@ -15,5 +17,13 @@ public class FolderManager {
             }
             FLoader.LOGGER.warn("Mods folder created.");
         }
+    }
+
+    public static String getAssetPath(String path) {
+        for (Mod mod : ModManager.LOADED_MODS) {
+            File file = new File("fmods/" + mod.name + "/assets/" + path);
+            if (file.exists()) return file.getAbsolutePath();
+        }
+        return null;
     }
 }

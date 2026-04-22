@@ -5,6 +5,6 @@ import javassist.ClassPool;
 import javassist.NotFoundException;
 
 @FunctionalInterface
-public interface Injected {
+public interface Injection {
     void inject(ClassPool pool, String clname) throws NotFoundException, CannotCompileException;
 }
