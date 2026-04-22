@@ -12,9 +12,10 @@ public class LangManagerInject implements Injected {
         mGetLOA.insertBefore("{" +
                 "try {" +
                 "   int tipId = Integer.parseInt($1);" +
-                "   if (tipId >= (this.iLNOT - me.felek.floader.utils.RegistryManager.getTipsCount())) {" +
-                "       int customIdx = tipId - (this.iLNOT - me.felek.floader.utils.RegistryManager.getTipsCount());" +
-                "       return me.felek.floader.utils.RegistryManager.getTip(customIdx);" +
+                "   int customCount = me.felek.floader.utils.RegistryManager.getTipsCount();" +
+                "   int originalCount = this.iLNOT - customCount;" +
+                "   if (tipId >= originalCount) {" +
+                "       return me.felek.floader.utils.RegistryManager.getTip(tipId - originalCount);" +
                 "   }" +
                 "} catch (Exception e) {}" +
                 "}");

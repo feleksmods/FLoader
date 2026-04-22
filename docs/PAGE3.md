@@ -27,7 +27,7 @@ Province-related functions
 Example code that sets the country '``15'`` to 5000 gold per code:
 ```lua
 function onEvent() 
-fl.world.setCivMoney(15, 5000)
+    fl.world.setCivMoney(15, 5000)
 end
 
 subscribe("onTurnEnd", onEvent)

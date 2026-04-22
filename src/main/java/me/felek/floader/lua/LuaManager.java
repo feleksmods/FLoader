@@ -9,6 +9,7 @@ import me.felek.floader.lua.fl.event.ShowBasicEvent;
 import me.felek.floader.lua.fl.player.GetPlayerCiv;
 import me.felek.floader.lua.fl.registry.*;
 import me.felek.floader.lua.fl.res.LoadImage;
+import me.felek.floader.lua.fl.settings.SetWindowTitle;
 import me.felek.floader.lua.fl.unsafe.GetCFG;
 import me.felek.floader.lua.fl.utils.*;
 import me.felek.floader.lua.fl.world.*;
@@ -51,6 +52,10 @@ public class LuaManager {
         api.set("getModInfo", new GetModInfo());
         api.set("getLoaderVersion", new GetLoaderVersion());
         api.set("getLoaderName", new GetLoaderName());
+        api.set("GetFPS", new GetFPS());//TODO: Add this to the documentation
+        api.set("GetDeltaTime", new GetDeltaTime());
+        api.set("exitGame", new ExitGame());
+        api.set("rebuildUI", new RebuildUI());
 
         steam.set("grantAchievement", new GrantSteamAchievement());
         steam.set("setRichPresence", new SetRichPresence());
@@ -72,6 +77,8 @@ public class LuaManager {
         Binder.bind(settingsModule, "ButtonW", CFG.class, "BUTTON_W");
         Binder.bind(settingsModule, "Padding", CFG.class, "PADD");
         Binder.bind(settingsModule, "Density", CFG.class, "DENSITY");
+
+        settingsModule.set("setWindowTitle", new SetWindowTitle());
 
         for (BonusType type : BonusType.values())
             bonus.set(type.name(), LuaValue.valueOf(type.name()));

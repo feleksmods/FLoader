@@ -13,4 +13,5 @@
 > - 0.7Dt
 
 ## Versions
+- 0.4B - added GetFPS, exitGame, GetDeltaTime, RebuildUI, setWindowTitle functions + registerCustomTip fix
 - 0.4A - added changelog, fixed world module, documentation

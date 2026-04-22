@@ -1,7 +1,7 @@
 # Page 6 - List of all events
 This is a **COMPLETE** list of all events currently available in the mod loader
 
-onGameInitialization: Called after the game has fully loaded and all FLoader systems have been initialized
+- onGameInitialization: Called after the game has fully loaded and all FLoader systems have been initialized
 - onTurnEnd: Called at the end of each turn
 - onDayChange(daysPassed): Called when the day changes daysPassed (number) is the number of days that have passed
 - onMonthChange(newMonth): Called when the month changes newMonth (number) is the new month's number (1-12)
