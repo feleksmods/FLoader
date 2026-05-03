@@ -1,135 +1,125 @@
 package me.felek.floader.mod;
 
-import com.google.gson.Gson;
 import me.felek.floader.FLoader;
-import me.felek.floader.lua.LuaManager;
-import me.felek.floader.utils.ExitCode;
+import me.felek.floader.api.IMod;
+import me.felek.floader.api.Mod;
 import me.felek.floader.utils.FolderManager;
-import me.felek.floader.utils.IOLib;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ConfigurationBuilder;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ModManager {
-    public static List<Mod> LOADED_MODS;
-    private static final Gson gson = new Gson();
+    public static List<ModEntry> LOADED_MODS;
 
     public static void init() {
         LOADED_MODS = new ArrayList<>();
     }
 
-    public static Mod getModByName(String name) {
-         for (Mod mod : LOADED_MODS) {
-             if (mod.name.equals(name)) {
-                 return mod;
-             }
-         }
-
-         return null;
-    }
-
-    public static boolean loadBaseMod() {
-        FLoader.LOGGER.info("Loading internal BaseMod");
-        String script = IOLib.readResourceText("/floader/scripts/script.lua");
-
-        if (script == null || script.isEmpty()) {
-            ExitCode.LUA_BASE_MOD_MISSING.throwFatalError("Internal BaseMod (script.lua) was not found inside the JAR!");
-            return false;
-        }
-
-        try {
-            LuaManager.GLOBALS.load(script).call();
-            FLoader.LOGGER.info("BaseMod initialized.");
-            return true;
-        } catch (Exception e) {
-            ExitCode.LUA_BASE_MOD_CRASH.throwFatalError("BaseMod runtime error: " + e.getMessage());
-            return false;
-        }
-    }
-
-    public static void loadMods() {
+    public static void loadAndInitializeMods() {
+        FLoader.LOGGER.info("Searching for mods...");
+        List<ModEntry> foundMods = new ArrayList<>();//TODO: split into method
         File[] files = FolderManager.MODS_DIR.listFiles();
-        if (files==null) return;
+        if (files != null) {
+            for (File modFile : files) {
+                if (modFile.isFile() && modFile.getName().endsWith(".jar")) {
+                    try {
+                        URLClassLoader classLoader = new URLClassLoader(new URL[]{modFile.toURI().toURL()}, ModManager.class.getClassLoader());
+                        Reflections reflections = new Reflections(new ConfigurationBuilder()
+                                .setUrls(modFile.toURI().toURL())
+                                .addClassLoaders(classLoader)
+                                .setScanners(Scanners.TypesAnnotated));
 
-        List<Mod> raw = new ArrayList<>();
+                        Set<Class<?>> modClasses = reflections.getTypesAnnotatedWith(Mod.class);
 
-        for (File modDir : files) {
-            if (modDir.isDirectory()) {
-                Mod mod = parseModCfg(modDir);
-                if (mod != null) raw.add(mod);
+                        for (Class<?> clazz : modClasses) {
+                            if (IMod.class.isAssignableFrom(clazz)) {
+                                Mod anno = clazz.getAnnotation(Mod.class);
+                                IMod instance = (IMod) clazz.getDeclaredConstructor().newInstance();
+                                foundMods.add(new ModEntry(anno, instance));
+                                FLoader.LOGGER.info("Detected mod: " + anno.id());
+                            } else {
+                                FLoader.LOGGER.error("Class selected as @Mod but not implementing IMod.");
+                            }
+                        }
+                    } catch (Exception exc) {
+                        FLoader.LOGGER.error("Error while reading .jar file!\n" + exc.toString());
+                    }
+                }
             }
         }
 
-        LOADED_MODS = sortByDependencies(raw);
-        FLoader.LOGGER.info("Resolved load order for " + LOADED_MODS.size() + " mods");
-        for (Mod mod : LOADED_MODS) {
-            File script = new File(FolderManager.MODS_DIR, mod.name + "/scripts/" + mod.mainFile);
-            if (!script.exists()) {
-                ExitCode.MOD_MAIN_SCRIPT_MISSING.throwFatalError("Mod: " + mod.name + " | Missing file: " + script.getAbsolutePath());//TODO: check, maybe this is not critical error
-            }
+        if (foundMods.isEmpty()) {
+            FLoader.LOGGER.info("No mods found.");
+            return;
+        }
 
+        FLoader.LOGGER.info("Sorting mods and dependencies...");
+        List<ModEntry> sortedMods = sortByDependencies(foundMods);
+
+        LOADED_MODS.addAll(sortedMods);
+
+        FLoader.LOGGER.info("Initializing mods...");
+        for (ModEntry entry : LOADED_MODS) {
             try {
-                FLoader.LOGGER.info("Initializing " + mod.name + "...");
-                LuaManager.GLOBALS.loadfile(script.getAbsolutePath()).call();
-            } catch (Exception e) {
-                FLoader.LOGGER.error("Error in " + mod.name + ": " + e.getMessage());
+                FLoader.LOGGER.info("-> Initializing mod " + entry.id + " v." + entry.version);
+                entry.instance.onPreInitialization();
+            } catch (Exception exc) {
+                FLoader.LOGGER.error("Critical error while loading mod.");//TODO: error code here!
             }
         }
-    }
-
-    private static Mod parseModCfg(File dir) {
-        File cfg = new File(dir, "config/config.json");
-
-        try {
-            String cfgContent = IOLib.readAllText(cfg);
-            Mod mod = gson.fromJson(cfgContent, Mod.class);
-            if (mod != null) return mod;
-        } catch (Exception exception) {
-            FLoader.LOGGER.error("Invalid config: " + dir.getName());
+        for (ModEntry entry : LOADED_MODS) {
+            try {
+                FLoader.LOGGER.info("-> Enabling mod " + entry.id + " v." + entry.version);
+                entry.instance.onEnable();
+            } catch (Exception exc) {
+                FLoader.LOGGER.error("Critical error while enabling mod.");//TODO: error code here!
+            }
         }
 
-        return null;
+        FLoader.LOGGER.info("Mods initialized.");
     }
 
-    private static List<Mod> sortByDependencies(List<Mod> mods) {
-        List<Mod> sorted = new ArrayList<>();
+    private static List<ModEntry> sortByDependencies(List<ModEntry> mods) {
+        List<ModEntry> sorted = new ArrayList<>();
+        Map<String, ModEntry> modMap = mods.stream().collect(Collectors.toMap(m -> m.id, m -> m));
         Set<String> visited = new HashSet<>();
-        Set<String> loading = new HashSet<>();
-        Map<String, Mod> modMap = new HashMap<>();
+        Set<String> visiting = new HashSet<>();
 
-        for (Mod m : mods) modMap.put(m.name, m);
-        for (Mod m : mods) {
-            if (!visited.contains(m.name)) {
-                visit(m, modMap, visited, loading, sorted);
+        for (ModEntry mod : mods) {
+            if (!visited.contains(mod.id)) {
+                visit(mod, modMap, visited, visiting, sorted);
             }
         }
         return sorted;
     }
 
-    private static void visit(Mod mod, Map<String, Mod> allMods, Set<String> visited, Set<String> loading, List<Mod> sorted) {
-        if (loading.contains(mod.name)) {
-            ExitCode.MOD_CYCLIC_DEPENDENCY.throwFatalError("Circular dependency detected at mod: " + mod.name);
+    private static void visit(ModEntry mod, Map<String, ModEntry> modMap, Set<String> visited, Set<String> visiting, List<ModEntry> sorted) {
+        if (visiting.contains(mod.id)) {
+            throw new RuntimeException("Detected cyclic depending: " + mod.id);
+        }
+        if (visited.contains(mod.id)) {
+            return;
         }
 
-        if (!visited.contains(mod.name)) {
-            loading.add(mod.name);
-            if (mod.dependencies != null) {
-                for (String depName : mod.dependencies) {
-                    Mod dep = allMods.get(depName);
-                    if (dep != null) {
-                        visit(dep, allMods, visited, loading, sorted);
-                    } else {
-                        FLoader.LOGGER.warn("Mod '" + mod.name + "' misses optional dependency: " + depName);
-                    }
-                }
+        visiting.add(mod.id);
+
+        for (String depId : mod.dependencies) {
+            ModEntry dependency = modMap.get(depId);
+            if (dependency != null) {
+                visit(dependency, modMap, visited, visiting, sorted);
+            } else {
+                throw new RuntimeException("Mod '" + mod.id + "' depending '" + depId + "', which not found!");
             }
-
-            loading.remove(mod.name);
-            visited.add(mod.name);
-            sorted.add(mod);
         }
+
+        visiting.remove(mod.id);
+        visited.add(mod.id);
+        sorted.add(mod);
     }
 }

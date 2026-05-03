@@ -8,6 +8,6 @@ public class CFGInject implements Injection {
     public void inject(ClassPool pool, String clname) throws NotFoundException, CannotCompileException {
         CtClass cc = pool.get(clname);
         CtMethod m = cc.getDeclaredMethod("createUnionCivs");
-        m.insertBefore("{ me.felek.floader.lua.eventSystem.EventBus.call(\"onUnionFormed\", ($w)$1, ($w)$2); }");
+        m.insertBefore("{ me.felek.floader.api.event.EventBus.call(\"onUnionFormed\", ($w)$1, ($w)$2); }");
     }
 }

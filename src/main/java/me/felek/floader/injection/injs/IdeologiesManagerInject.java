@@ -11,6 +11,6 @@ public class IdeologiesManagerInject implements Injection {
         cc.getDeclaredField("lIdeologies").setModifiers(java.lang.reflect.Modifier.PUBLIC);
 
         CtMethod mLoad = cc.getDeclaredMethod("loadIdeologies");
-        mLoad.insertAfter("{ me.felek.floader.lua.eventSystem.EventBus.call(\"onIdeologiesInit\"); }");
+        mLoad.insertAfter("{ me.felek.floader.api.event.EventBus.call(\"onIdeologiesInit\"); }");
     }
 }

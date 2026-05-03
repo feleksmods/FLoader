@@ -10,7 +10,7 @@ public class MenuInitGameInject implements Injection {
 
         CtMethod m = cc.getDeclaredMethod("loadBackground");
         m.insertAfter("{" +
-                "age.of.civilizations2.jakowski.lukasz.Image customImg = me.felek.floader.utils.RegistryManager.getRandomCustomScreen();" +
+                "age.of.civilizations2.jakowski.lukasz.Image customImg = me.felek.floader.api.FLoader.registryManager.getRandomCustomScreen();" +
                 "if (customImg != null) {" +
                 "   background = customImg;" +
                 "   backgroundWidth = age.of.civilizations2.jakowski.lukasz.CFG.GAMEWIDTH;" +

@@ -9,9 +9,10 @@ public class GameActionInject implements Injection {
         CtClass cc = pool.get(clname);
 
         CtMethod m = cc.getDeclaredMethod("startNewTurn_End");
-        m.insertAfter("{ me.felek.floader.lua.eventSystem.EventBus.call(\"onTurnEnd\"); }");
+        m.insertAfter("{ me.felek.floader.api.event.EventBus.call(\"onTurnEnd\"); }");
 
-        CtMethod civDestroyed = cc.getDeclaredMethod("civDestroyed");
-        civDestroyed.insertAfter("{ me.felek.floader.lua.eventSystem.EventBus.call(\"onCivDestroyed\", ($w)$1); }");
+        //TODO: valid event call
+//        CtMethod civDestroyed = cc.getDeclaredMethod("civDestroyed");
+//        civDestroyed.insertAfter("{ me.felek.floader.api.event.EventBus.call(\"onCivDestroyed\", ($w)$1); }");
     }
 }

@@ -1,73 +1,73 @@
 package me.felek.floader.utils;
 
 import age.of.civilizations2.jakowski.lukasz.Image;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import me.felek.floader.FLoader;
-import org.luaj.vm2.LuaFunction;
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
+import me.felek.floader.api.game.IRegistry;
 
+import java.io.File;
 import java.util.*;
+import java.util.function.Consumer;
 
-public class RegistryManager {
-    public static List<String> customLoadingTips = new ArrayList<>();
-    public static final Map<String, LuaFunction> commands = new HashMap<>();
-    public static final Map<String, Image> resources = new HashMap<>();
-    public static final List<String> customLoadingScreens = new ArrayList<>();
-    public static Map<String, List<String>> customStations = new HashMap<>();
+public class RegistryManager implements IRegistry {
+    public List<String> customLoadingTips = new ArrayList<>();
+    public final Map<String, Consumer<String[]>> commands = new HashMap<>();
+    public final Map<String, Image> resources = new HashMap<>();
+    public final List<String> customLoadingScreens = new ArrayList<>();
+    public Map<String, List<String>> customStations = new HashMap<>();
 
-    public static void registerStation(String name, List<String> tracks) {
+    public void registerStation(String name, List<String> tracks) {
         customStations.put(name, tracks);
     }
 
-    public static void clear() {
+    public void clear() {
         customLoadingTips.clear();
         commands.clear();
         customLoadingScreens.clear();
         FLoader.LOGGER.info("Registry cleared.");
     }
 
-    public static void registerCommand(String commandName, LuaFunction func) {
+    public void registerCommand(String commandName, Consumer<String[]> func) {
         if (commands.containsKey(commandName.toLowerCase())) {
             ExitCode.REG_COMMAND_ERROR.throwFatalError("Command duplicate: " + commandName);
         }
         commands.put(commandName.toLowerCase(), func);
     }
 
-    public static void registerLoadingScreen(String resourceKey) {
+    public void registerLoadingScreen(String resourceKey) {
         if (resources.containsKey(resourceKey)) {
             customLoadingScreens.add(resourceKey);
         }
     }
 
 
-    public static void registerResource(String key, Image img) {
+    public void registerResource(String key, Image img) {
         if (resources.containsKey(key)) {
             ExitCode.REG_RESOURCE_DUPLICATE.throwFatalError("Resource collision: " + key);
         }
         resources.put(key, img);
     }
 
-    public static Image getRandomCustomScreen() {
+    public Image getRandomCustomScreen() {
         if (customLoadingScreens.isEmpty()) return null;
         String key = customLoadingScreens.get(new Random().nextInt(customLoadingScreens.size()));
         return resources.get(key);
     }
 
 
-    public static boolean executeCommand(String full) {
+    public boolean executeCommand(String full) {
+        if (full == null || full.isEmpty()) return false;
+
         String[] splitted = full.split(" ");
         String base = splitted[0].toLowerCase();
 
         if (commands.containsKey(base)) {
             try {
-                LuaTable args = LuaValue.tableOf();
-                for (int i = 0; i < splitted.length; i++) {
-                    args.set(i,LuaValue.valueOf(splitted[i]));
-                }
-
-                commands.get(base).call(args);
+                commands.get(base).accept(splitted);
                 return true;
             } catch (Exception exc) {
+                FLoader.LOGGER.error("Error executing command '" + base + "': " + exc.getMessage());
                 exc.printStackTrace();
             }
         }
@@ -75,18 +75,54 @@ public class RegistryManager {
         return false;
     }
 
-    public static void registerLoadingTip(String tip) {
+    public void registerLoadingTip(String tip) {
         customLoadingTips.add(tip);
     }
 
-    public static int getTipsCount() {
+    public int getTipsCount() {
         return customLoadingTips.size();
     }
 
-    public static String getTip(int index) {
+    public String getTip(int index) {
         if (index >= 0 && index < customLoadingTips.size()) {
             return (String) customLoadingTips.get(index);
         }
         return "FLoader Error: Tip index out of bounds";
+    }
+
+    @Override
+    public boolean containsResource(String key) {
+        return resources.containsKey(key);
+    }
+
+    @Override
+    public Image getResource(String key) {
+        return resources.get(key);
+    }
+
+    @Override
+    public Map getCustomStations() {
+        return customStations;
+    }
+
+    @Override
+    public Image loadImage(String modId, String path) {
+        String key = modId + ":" + path;
+        if (resources.containsKey(key)) return resources.get(key);
+
+        File file = new File("fmods/" + modId + "/assets/" + path);
+        if (file.exists()) {
+            try {
+                Texture tex = new Texture(Gdx.files.absolute(file.getAbsolutePath()));
+                tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+                Image img = new Image(tex, Texture.TextureFilter.Linear, Texture.TextureWrap.ClampToEdge);
+                resources.put(key, img);
+                return img;
+            } catch (Exception e) {
+                FLoader.LOGGER.error("Failed to load image: " + file.getAbsolutePath(), e);
+            }
+        }
+
+        return null;
     }
 }

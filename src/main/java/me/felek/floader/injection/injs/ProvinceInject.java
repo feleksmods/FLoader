@@ -12,6 +12,6 @@ public class ProvinceInject implements Injection {
         CtClass cc = pool.get(clname);
 
         cc.getDeclaredMethod("setCivId", new CtClass[]{CtClass.intType, CtClass.booleanType, CtClass.booleanType})
-                .insertAfter("{ me.felek.floader.lua.eventSystem.EventBus.call(\"onProvinceOwnerChanged\", ($w)this.iProvinceID, ($w)$1, ($w)$2); }");
+                .insertAfter("{ me.felek.floader.api.event.EventBus.call(\"onProvinceOwnerChanged\", ($w)this.iProvinceID, ($w)$1, ($w)$2); }");
     }
 }

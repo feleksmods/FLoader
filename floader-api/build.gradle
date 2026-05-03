@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+}
+
+group = 'me.felek.fenix'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    //AOH2: DE
+    implementation files('../libs/game.jar')
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar {
+    archiveFileName="floaderapi.jar"
+}
+
+task exportApi(type: Copy) {
+    from jar.archiveFile
+    into "../libs"
+}
+
+jar.finalizedBy(exportApi)

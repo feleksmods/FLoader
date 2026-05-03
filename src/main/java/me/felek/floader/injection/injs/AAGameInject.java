@@ -11,6 +11,6 @@ public class AAGameInject implements Injection {
 
         m.insertBefore("{ me.felek.floader.FLoader.initModdingTools(); }");
 
-        m.insertAfter("{ me.felek.floader.lua.eventSystem.EventBus.call(\"onGameInitialization\"); }");
+        m.insertAfter("{ me.felek.floader.api.event.EventBus.call(\"onGameInitialization\"); }");
     }
 }

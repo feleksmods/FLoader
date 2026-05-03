@@ -9,6 +9,6 @@ public class CommandsInject implements Injection {
         CtClass cc = pool.get(clname);
 
         CtMethod m = cc.getDeclaredMethod("execute");
-        m.insertBefore("{ if (me.felek.floader.utils.RegistryManager.executeCommand($1)) return; }");
+        m.insertBefore("{ if (me.felek.floader.api.FLoader.registryManager.executeCommand($1)) return; }");
     }
 }
