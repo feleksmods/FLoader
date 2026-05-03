@@ -12,7 +12,7 @@ public class ReligionManagerInject implements Injection {
         cc.getDeclaredField("iReligionsSize").setModifiers(java.lang.reflect.Modifier.PUBLIC);
 
         CtMethod mLoad = cc.getDeclaredMethod("loadReligions");
-        mLoad.insertAfter("{ me.felek.floader.lua.eventSystem.EventBus.call(\"onReligionsInit\"); }");
+        mLoad.insertAfter("{ me.felek.floader.api.event.EventBus.call(\"onReligionsInit\"); }");
 
         CtMethod mGet = cc.getDeclaredMethod("getReligion");
         mGet.insertBefore("if ($1 >= this.lReligions.size() || $1 < 0) return (age.of.civilizations2.jakowski.lukasz.ReligionManager$Religion)this.lReligions.get(0);");

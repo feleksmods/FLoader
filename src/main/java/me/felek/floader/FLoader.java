@@ -4,12 +4,9 @@ import javassist.*;
 import me.felek.floader.injection.AoCGameInject;
 import me.felek.floader.injection.GameManagerInject;
 import me.felek.floader.injection.Injection;
-import me.felek.floader.lua.LuaManager;
-import me.felek.floader.lua.eventSystem.EventBus;
 import me.felek.floader.mod.ModManager;
 import me.felek.floader.utils.ExitCode;
 import me.felek.floader.utils.FolderManager;
-import me.felek.floader.utils.KeybindManager;
 import me.felek.floader.utils.RegistryManager;
 import me.felek.floader.utils.annos.Unsafe;
 import org.apache.logging.log4j.LogManager;
@@ -117,43 +114,32 @@ public class FLoader {
     }
 
     public static void initModdingTools() {
-        if (LuaManager.GLOBALS != null) return;
+        me.felek.floader.api.FLoader.registryManager = new RegistryManager();
 
-        LOGGER.info("Initializing lua execution service");
-        LuaManager.init();
-        LOGGER.info("Lua execution service initialized.");
         LOGGER.info("Initializing ModManager...");
         ModManager.init();
         LOGGER.info("ModManager initialized.");
 
-        LOGGER.info("Loading FLoader baseMod");
-        if (!ModManager.loadBaseMod()) {
-            LOGGER.fatal("FLoader FAILED TO START: BaseMod is missing!");
-            LOGGER.fatal("Check your JAR file integrity.");
-            System.exit(-1);
-        }
-        LOGGER.info("Base mod successfully loaded.");
-
         LOGGER.info("Loading mods...");
-        ModManager.loadMods();
+        ModManager.loadAndInitializeMods();
         LOGGER.info("Mods loaded.");
     }
 
     @Unsafe
-    public static void reload() {
-        LOGGER.info("Reloading FLoader...");
-        EventBus.clear();
-        RegistryManager.clear();
-        LuaManager.init();
-        ModManager.init();
-        KeybindManager.clear();
-
-        LOGGER.info("Loading BaseMod during reload...");
-        if (ModManager.loadBaseMod()) {
-            LOGGER.info("Loading external mods during reload...");
-            ModManager.loadMods();
-        }
-
-        LOGGER.info("FLoader reloaded successfully!");
+    public static void reload() {//TODO: port
+//        LOGGER.info("Reloading FLoader...");
+//        Eve.clear();
+//        RegistryManager.clear();
+//        LuaManager.init();
+//        ModManager.init();
+//        KeybindManager.clear();
+//
+//        LOGGER.info("Loading BaseMod during reload...");
+//        if (ModManager.loadBaseMod()) {
+//            LOGGER.info("Loading external mods during reload...");
+//            ModManager.loadAndInitializeMods();
+//        }
+//
+//        LOGGER.info("FLoader reloaded successfully!");
     }
 }

@@ -11,7 +11,7 @@ public class WarGameDataInject implements Injection {
         CtConstructor[] constructors = cc.getDeclaredConstructors();
         for (CtConstructor constructor : constructors) {
             if (constructor.getSignature().equals("(II)V")) {
-                constructor.insertAfter("{ me.felek.floader.lua.eventSystem.EventBus.call(\"onWarDeclared\", ($w)$1, ($w)$2); }");
+                constructor.insertAfter("{ me.felek.floader.api.event.EventBus.call(\"onWarDeclared\", ($w)$1, ($w)$2); }");
             }
         }
     }

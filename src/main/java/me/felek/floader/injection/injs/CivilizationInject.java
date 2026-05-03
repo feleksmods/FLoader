@@ -12,18 +12,18 @@ public class CivilizationInject implements Injection {
         CtClass cc = pool.get(clname);
 
         cc.getDeclaredMethod("setCapitalProvID").insertAfter(
-                "{ me.felek.floader.lua.eventSystem.EventBus.call(\"onCapitalMoved\", ($w)this.iCivId, ($w)$1); }");
+                "{ me.felek.floader.api.event.EventBus.call(\"onCapitalMoved\", ($w)this.iCivId, ($w)$1); }");
 
         cc.getDeclaredMethod("setIdeology").insertAfter(
-                "{ me.felek.floader.lua.eventSystem.EventBus.call(\"onIdeologyChanged\", ($w)this.iCivId, ($w)$1); }");
+                "{ me.felek.floader.api.event.EventBus.call(\"onIdeologyChanged\", ($w)this.iCivId, ($w)$1); }");
 
         cc.getDeclaredMethod("setTechLevel").insertAfter(
-                "{ me.felek.floader.lua.eventSystem.EventBus.call(\"onTechLeveledUp\", ($w)this.iCivId, ($w)$1); }");
+                "{ me.felek.floader.api.event.EventBus.call(\"onTechLeveledUp\", ($w)this.iCivId, ($w)$1); }");
 
         cc.getDeclaredMethod("setGold").insertAfter(
-                "{ me.felek.floader.lua.eventSystem.EventBus.call(\"onGoldChanged\", ($w)this.iCivId, ($w)$1); }");
+                "{ me.felek.floader.api.event.EventBus.call(\"onGoldChanged\", ($w)this.iCivId, ($w)$1); }");
 
         cc.getDeclaredMethod("setTruce3").insertAfter(
-                "{ me.felek.floader.lua.eventSystem.EventBus.call(\"onTruceSigned\", ($w)this.iCivId, ($w)$1, ($w)$2); }");
+                "{ me.felek.floader.api.event.EventBus.call(\"onTruceSigned\", ($w)this.iCivId, ($w)$1, ($w)$2); }");
     }
 }

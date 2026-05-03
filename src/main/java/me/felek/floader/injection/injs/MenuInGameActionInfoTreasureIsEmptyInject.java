@@ -8,6 +8,6 @@ public class MenuInGameActionInfoTreasureIsEmptyInject implements Injection {
     public void inject(ClassPool pool, String clname) throws NotFoundException, CannotCompileException {
         CtClass cc = pool.get(clname);
         CtConstructor cons = cc.getDeclaredConstructors()[0];
-        cons.insertAfter("{ me.felek.floader.lua.eventSystem.EventBus.call(\"onTreasuryEmpty\"); }");
+        cons.insertAfter("{ me.felek.floader.api.event.EventBus.call(\"onTreasuryEmpty\"); }");
     }
 }

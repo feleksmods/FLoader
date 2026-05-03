@@ -1,7 +1,8 @@
 package me.felek.floader.utils;
 
 import me.felek.floader.FLoader;
-import me.felek.floader.mod.Mod;
+import me.felek.floader.api.Mod;
+import me.felek.floader.mod.ModEntry;
 import me.felek.floader.mod.ModManager;
 
 import java.io.File;
@@ -20,8 +21,8 @@ public class FolderManager {
     }
 
     public static String getAssetPath(String path) {
-        for (Mod mod : ModManager.LOADED_MODS) {
-            File file = new File("fmods/" + mod.name + "/assets/" + path);
+        for (ModEntry mod : ModManager.LOADED_MODS) {
+            File file = new File("fmods/" + mod.id + "/assets/" + path);
             if (file.exists()) return file.getAbsolutePath();
         }
         return null;

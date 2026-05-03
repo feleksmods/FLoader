@@ -11,7 +11,7 @@ public class SFXManagerInject implements Injection {
         CtConstructor cons = cc.getDeclaredConstructors()[0];
 
         cons.insertAfter("{" +
-                "  java.util.Iterator it = me.felek.floader.utils.RegistryManager.customStations.entrySet().iterator();" +
+                "  java.util.Iterator it = me.felek.floader.api.FLoader.registryManager.getCustomStations().entrySet().iterator();" +
                 "  while(it.hasNext()) {" +
                 "    java.util.Map.Entry entry = (java.util.Map.Entry)it.next();" +
                 "    String name = (String)entry.getKey();" +

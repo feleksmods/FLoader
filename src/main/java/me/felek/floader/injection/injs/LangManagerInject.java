@@ -12,15 +12,15 @@ public class LangManagerInject implements Injection {
         mGetLOA.insertBefore("{" +
                 "try {" +
                 "   int tipId = Integer.parseInt($1);" +
-                "   int customCount = me.felek.floader.utils.RegistryManager.getTipsCount();" +
+                "   int customCount = me.felek.floader.api.FLoader.registryManager.getTipsCount();" +
                 "   int originalCount = this.iLNOT - customCount;" +
                 "   if (tipId >= originalCount) {" +
-                "       return me.felek.floader.utils.RegistryManager.getTip(tipId - originalCount);" +
+                "       return me.felek.floader.api.FLoader.registryManager.getTip(tipId - originalCount);" +
                 "   }" +
                 "} catch (Exception e) {}" +
                 "}");
 
         CtMethod mInit = cc.getDeclaredMethod("initLoadingBundle");
-        mInit.insertAfter("{ this.iLNOT += me.felek.floader.utils.RegistryManager.getTipsCount(); }");
+        mInit.insertAfter("{ this.iLNOT += me.felek.floader.api.FLoader.registryManager.getTipsCount(); }");
     }
 }

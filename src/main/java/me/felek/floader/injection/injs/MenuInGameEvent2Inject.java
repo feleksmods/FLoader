@@ -11,9 +11,9 @@ public class MenuInGameEvent2Inject implements Injection {
         CtMethod m = cc.getDeclaredMethod("loadEventIMG");
         m.insertBefore("{" +
                 "String pictureKey = age.of.civilizations2.jakowski.lukasz.CFG.eventsManager.getEvent(age.of.civilizations2.jakowski.lukasz.Menus.ZRest.Menu_InGame_Event.EVENT_ID).getEventPicture();" +
-                "if (me.felek.floader.utils.RegistryManager.resources.containsKey(pictureKey)) {" +
+                "if (me.felek.floader.api.FLoader.registryManager.resources.containsKey(pictureKey)) {" +
                 "   age.of.civilizations2.jakowski.lukasz.Menus.ZRest.Menu_InGame_Event.eventsIMGs.clear();" +
-                "   age.of.civilizations2.jakowski.lukasz.Menus.ZRest.Menu_InGame_Event.eventsIMGs.add((age.of.civilizations2.jakowski.lukasz.Image)me.felek.floader.utils.RegistryManager.resources.get(pictureKey));" +
+                "   age.of.civilizations2.jakowski.lukasz.Menus.ZRest.Menu_InGame_Event.eventsIMGs.add((age.of.civilizations2.jakowski.lukasz.Image)me.felek.floader.api.FLoader.registryManager.resources.get(pictureKey));" +
                 "   age.of.civilizations2.jakowski.lukasz.Menus.ZRest.Menu_InGame_Event.ANIMATION_IMG_ID = 0;" +
                 "   age.of.civilizations2.jakowski.lukasz.Menus.ZRest.Menu_InGame_Event.ANIMATION_TIME = System.currentTimeMillis();" +
                 "   return;" +

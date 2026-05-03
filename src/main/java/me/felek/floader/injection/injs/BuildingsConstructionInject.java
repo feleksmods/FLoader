@@ -8,6 +8,6 @@ public class BuildingsConstructionInject implements Injection {
     public void inject(ClassPool pool, String clname) throws NotFoundException, CannotCompileException {
         CtClass cc = pool.get(clname);
         CtMethod m = cc.getDeclaredMethod("onConstructedRun");
-        m.insertAfter("{ me.felek.floader.lua.eventSystem.EventBus.call(\"onBuildingConstructed\", ($w)$1, ($w)this.iProviID, this.constructionType.toString()); }");
+        m.insertAfter("{ me.felek.floader.api.event.EventBus.call(\"onBuildingConstructed\", ($w)$1, ($w)this.iProviID, this.constructionType.toString()); }");
     }
 }

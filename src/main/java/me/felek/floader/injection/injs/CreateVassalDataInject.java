@@ -8,6 +8,6 @@ public class CreateVassalDataInject implements Injection {
     public void inject(ClassPool pool, String clname) throws NotFoundException, CannotCompileException {
         CtClass cc = pool.get(clname);
         CtMethod m = cc.getDeclaredMethod("setCivTag");
-        m.insertAfter("{ me.felek.floader.lua.eventSystem.EventBus.call(\"onVassalCreated\", $1); }");
+        m.insertAfter("{ me.felek.floader.api.event.EventBus.call(\"onVassalCreated\", $1); }");
     }
 }

@@ -8,6 +8,6 @@ public class EventOutcomeBuildDestroy implements Injection {
     public void inject(ClassPool pool, String clname) throws NotFoundException, CannotCompileException {
         CtClass cc = pool.get(clname);
         CtMethod m = cc.getDeclaredMethod("outcomeAction");
-        m.insertAfter("{ me.felek.floader.lua.eventSystem.EventBus.call(\"onBuildingDestroyed\", ($w)this.iCivID, ($w)this.buildingID); }");
+        m.insertAfter("{ me.felek.floader.api.event.EventBus.call(\"onBuildingDestroyed\", ($w)this.iCivID, ($w)this.buildingID); }");
     }
 }
