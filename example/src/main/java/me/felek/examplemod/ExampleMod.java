@@ -1,6 +1,5 @@
-package me.felek.fenix;
+package me.felek.examplemod;
 
-import me.felek.floader.api.FLoader;
 import me.felek.floader.api.IMod;
 import me.felek.floader.api.Mod;
 import me.felek.floader.api.event.EventBus;

@@ -1,9 +1,13 @@
 package me.felek.floader;
 
 import javassist.*;
-import me.felek.floader.injection.AoCGameInject;
-import me.felek.floader.injection.GameManagerInject;
+import me.felek.floader.api.mixin.At;
+import me.felek.floader.api.mixin.Inject;
+import me.felek.floader.injection.injs.AoCGameInject;
+import me.felek.floader.injection.injs.GameManagerInject;
 import me.felek.floader.injection.Injection;
+import me.felek.floader.mixin.MixinData;
+import me.felek.floader.mixin.MixinRegistry;
 import me.felek.floader.mod.ModManager;
 import me.felek.floader.utils.ExitCode;
 import me.felek.floader.utils.FolderManager;
@@ -12,9 +16,11 @@ import me.felek.floader.utils.annos.Unsafe;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Method;
 import java.security.ProtectionDomain;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +28,7 @@ import java.util.Map;
 import me.felek.floader.injection.injs.*;
 
 public class FLoader {
-    public static final String VERSION = "0.4A";
+    public static final String VERSION = "0.5Bt";
     public static final String NAME = "FLoader";//skids aren't allowed!
     public static final String FULL_NAME = NAME + " " + VERSION;
 
@@ -35,12 +41,45 @@ public class FLoader {
             ExitCode.CORE_AGENT_ERROR.throwFatalError("Instrumentation instance is null.");
         }
 
+        File[] files = new File("fmods/").listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.getName().endsWith(".jar")) {
+                    try { inst.appendToSystemClassLoaderSearch(new java.util.jar.JarFile(file)); }
+                    catch (Exception e) { LOGGER.error(e); }
+                }
+            }
+        }
+        ModManager.discoverMods();
+
         registerInjections();
+
+        me.felek.floader.api.FLoader.registryManager = new RegistryManager();
 
         inst.addTransformer(new ClassFileTransformer() {
             @Override
             public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
                 String clname = className.replace("/", ".");
+
+                if (MixinRegistry.hasMixinsFor(clname)) {
+                    try {
+                        ClassPool pool = ClassPool.getDefault();
+                        CtClass cc = pool.get(clname);
+
+                        for (MixinData mixin : MixinRegistry.getMixinsFor(clname)) {
+                            for (Method m : mixin.methods) {
+                                Inject injectAnno = m.getAnnotation(Inject.class);
+                                CtMethod targetMethod = cc.getDeclaredMethod(injectAnno.method());
+                                String code = mixin.mixinClass.getName() + "." + m.getName() + "($$);";
+
+                                if (injectAnno.at() == At.HEAD) targetMethod.insertBefore(code);
+                                else targetMethod.insertAfter(code);
+                            }
+                        }
+                        return cc.toBytecode();
+                    } catch (Exception e) { e.printStackTrace(); }//TODO: error
+                }
+
                 if (injections.containsKey(clname)) {
                     try {
                         ClassPool pool = ClassPool.getDefault();
@@ -114,14 +153,12 @@ public class FLoader {
     }
 
     public static void initModdingTools() {
-        me.felek.floader.api.FLoader.registryManager = new RegistryManager();
-
         LOGGER.info("Initializing ModManager...");
         ModManager.init();
         LOGGER.info("ModManager initialized.");
 
         LOGGER.info("Loading mods...");
-        ModManager.loadAndInitializeMods();
+        ModManager.initializeMods();
         LOGGER.info("Mods loaded.");
     }
 
