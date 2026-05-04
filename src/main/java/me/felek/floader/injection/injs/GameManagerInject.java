@@ -1,6 +1,7 @@
-package me.felek.floader.injection;
+package me.felek.floader.injection.injs;
 
 import javassist.*;
+import me.felek.floader.injection.Injection;
 
 public class GameManagerInject implements Injection {
     @Override

@@ -3,86 +3,96 @@ package me.felek.floader.mod;
 import me.felek.floader.FLoader;
 import me.felek.floader.api.IMod;
 import me.felek.floader.api.Mod;
+import me.felek.floader.api.mixin.Inject;
+import me.felek.floader.api.mixin.Mixin;
+import me.felek.floader.mixin.MixinData;
+import me.felek.floader.mixin.MixinRegistry;
 import me.felek.floader.utils.FolderManager;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ConfigurationBuilder;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ModManager {
-    public static List<ModEntry> LOADED_MODS;
+    public static List<ModEntry> LOADED_MODS = new ArrayList<>();
 
     public static void init() {
-        LOADED_MODS = new ArrayList<>();
+        LOADED_MODS.clear();
+        MixinRegistry.clear();
     }
 
-    public static void loadAndInitializeMods() {
-        FLoader.LOGGER.info("Searching for mods...");
-        List<ModEntry> foundMods = new ArrayList<>();//TODO: split into method
+    public static void discoverMods() {
+        FLoader.LOGGER.info("Scanning for JAR's and mixins...");
         File[] files = FolderManager.MODS_DIR.listFiles();
-        if (files != null) {
-            for (File modFile : files) {
-                if (modFile.isFile() && modFile.getName().endsWith(".jar")) {
-                    try {
-                        URLClassLoader classLoader = new URLClassLoader(new URL[]{modFile.toURI().toURL()}, ModManager.class.getClassLoader());
-                        Reflections reflections = new Reflections(new ConfigurationBuilder()
-                                .setUrls(modFile.toURI().toURL())
-                                .addClassLoaders(classLoader)
-                                .setScanners(Scanners.TypesAnnotated));
+        if (files == null) return;
 
-                        Set<Class<?>> modClasses = reflections.getTypesAnnotatedWith(Mod.class);
+        List<ModEntry> found = new ArrayList<>();
 
-                        for (Class<?> clazz : modClasses) {
-                            if (IMod.class.isAssignableFrom(clazz)) {
-                                Mod anno = clazz.getAnnotation(Mod.class);
-                                IMod instance = (IMod) clazz.getDeclaredConstructor().newInstance();
-                                foundMods.add(new ModEntry(anno, instance));
-                                FLoader.LOGGER.info("Detected mod: " + anno.id());
-                            } else {
-                                FLoader.LOGGER.error("Class selected as @Mod but not implementing IMod.");
+        for (File modFile : files) {
+            if (modFile.isFile() && modFile.getName().endsWith(".jar")) {
+                try {
+                    URL[] urls = {modFile.toURI().toURL()};
+                    URLClassLoader modClassLoader = new URLClassLoader(urls, ModManager.class.getClassLoader());
+
+                    Reflections reflections = new Reflections(new ConfigurationBuilder()
+                            .setUrls(urls)
+                            .addClassLoaders(modClassLoader)
+                            .setScanners(Scanners.TypesAnnotated));
+
+                    Set<Class<?>> modClasses = reflections.getTypesAnnotatedWith(Mod.class);
+                    for (Class<?> clazz : modClasses) {
+                        if (IMod.class.isAssignableFrom(clazz)) {
+                            Mod anno = clazz.getAnnotation(Mod.class);
+                            IMod instance = (IMod) clazz.getDeclaredConstructor().newInstance();
+                            found.add(new ModEntry(anno, instance));
+                            FLoader.LOGGER.info("Found mod: " + anno.id() + " v." + anno.version());
+                        }
+                    }
+
+                    Set<Class<?>> mixinClasses = reflections.getTypesAnnotatedWith(Mixin.class);
+                    for (Class<?> clazz : mixinClasses) {
+                        Mixin anno = clazz.getAnnotation(Mixin.class);
+                        MixinData data = new MixinData(clazz, anno.target());
+
+                        for (Method m : clazz.getDeclaredMethods()) {
+                            if (m.isAnnotationPresent(Inject.class)) {
+                                data.methods.add(m);
                             }
                         }
-                    } catch (Exception exc) {
-                        FLoader.LOGGER.error("Error while reading .jar file!\n" + exc.toString());
+                        MixinRegistry.register(data);
                     }
+                } catch (Exception exc) {
+                    FLoader.LOGGER.error("Failed to scan mod " + modFile.getName(), exc);
                 }
             }
         }
 
-        if (foundMods.isEmpty()) {
-            FLoader.LOGGER.info("No mods found.");
-            return;
-        }
+        LOADED_MODS.addAll(sortByDependencies(found));
+        FLoader.LOGGER.info("Loaded" + LOADED_MODS.size() + "mods");
+    }
 
-        FLoader.LOGGER.info("Sorting mods and dependencies...");
-        List<ModEntry> sortedMods = sortByDependencies(foundMods);
-
-        LOADED_MODS.addAll(sortedMods);
-
+    public static void initializeMods() {
         FLoader.LOGGER.info("Initializing mods...");
         for (ModEntry entry : LOADED_MODS) {
             try {
-                FLoader.LOGGER.info("-> Initializing mod " + entry.id + " v." + entry.version);
                 entry.instance.onPreInitialization();
-            } catch (Exception exc) {
-                FLoader.LOGGER.error("Critical error while loading mod.");//TODO: error code here!
+            } catch (Exception e) {
+                FLoader.LOGGER.error("Error during pre-init of " + entry.id, e);
             }
         }
         for (ModEntry entry : LOADED_MODS) {
             try {
-                FLoader.LOGGER.info("-> Enabling mod " + entry.id + " v." + entry.version);
                 entry.instance.onEnable();
-            } catch (Exception exc) {
-                FLoader.LOGGER.error("Critical error while enabling mod.");//TODO: error code here!
+            } catch (Exception e) {
+                FLoader.LOGGER.error("Error enabling mod " + entry.id, e);
             }
         }
-
-        FLoader.LOGGER.info("Mods initialized.");
     }
 
     private static List<ModEntry> sortByDependencies(List<ModEntry> mods) {
