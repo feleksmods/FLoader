@@ -10,9 +10,9 @@ public class FileManagerInject implements Injection {
         CtMethod m = cc.getDeclaredMethod("loadFile", new CtClass[]{ pool.get("java.lang.String") });
 
         m.insertBefore("{" +
-                "  String modPath = me.felek.floader.utils.FolderManager.getAssetPath($1);" +
-                "  if (modPath != null) {" +
-                "    return com.badlogic.gdx.Gdx.files.absolute(modPath);" +
+                "  com.badlogic.gdx.files.FileHandle modFile = me.felek.floader.utils.FolderManager.getModFile($1);" +
+                "  if (modFile != null) {" +
+                "    return modFile;" +
                 "  }" +
                 "}");
     }

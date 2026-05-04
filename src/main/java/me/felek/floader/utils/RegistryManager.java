@@ -2,6 +2,7 @@ package me.felek.floader.utils;
 
 import age.of.civilizations2.jakowski.lukasz.Image;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import me.felek.floader.FLoader;
 import me.felek.floader.api.game.IRegistry;
@@ -110,16 +111,18 @@ public class RegistryManager implements IRegistry {
         String key = modId + ":" + path;
         if (resources.containsKey(key)) return resources.get(key);
 
-        File file = new File("fmods/" + modId + "/assets/" + path);
-        if (file.exists()) {
+        FileHandle handle = FolderManager.getModFile(path);
+        if (handle != null) {
             try {
-                Texture tex = new Texture(Gdx.files.absolute(file.getAbsolutePath()));
+                Texture tex = new Texture(handle);
                 tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
                 Image img = new Image(tex, Texture.TextureFilter.Linear, Texture.TextureWrap.ClampToEdge);
                 resources.put(key, img);
+
                 return img;
             } catch (Exception e) {
-                FLoader.LOGGER.error("Failed to load image: " + file.getAbsolutePath(), e);
+                FLoader.LOGGER.error("Failed to load image: " + handle.file().getAbsolutePath(), e);
             }
         }
 

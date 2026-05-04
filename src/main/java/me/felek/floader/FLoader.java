@@ -28,7 +28,7 @@ import java.util.Map;
 import me.felek.floader.injection.injs.*;
 
 public class FLoader {
-    public static final String VERSION = "0.5Bt";
+    public static final String VERSION = "0.5Ct";
     public static final String NAME = "FLoader";//skids aren't allowed!
     public static final String FULL_NAME = NAME + " " + VERSION;
 
@@ -61,10 +61,14 @@ public class FLoader {
             public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
                 String clname = className.replace("/", ".");
 
-                if (MixinRegistry.hasMixinsFor(clname)) {
-                    try {
-                        ClassPool pool = ClassPool.getDefault();
-                        CtClass cc = pool.get(clname);
+                boolean modified = false;
+                ClassPool pool = ClassPool.getDefault();
+                CtClass cc = null;
+
+                try {
+                    if (MixinRegistry.hasMixinsFor(clname)) {
+                        cc = pool.get(clname);
+                        pool.appendClassPath(new LoaderClassPath(loader));
 
                         for (MixinData mixin : MixinRegistry.getMixinsFor(clname)) {
                             for (Method m : mixin.methods) {
@@ -76,26 +80,27 @@ public class FLoader {
                                 else targetMethod.insertAfter(code);
                             }
                         }
-                        return cc.toBytecode();
-                    } catch (Exception e) { e.printStackTrace(); }//TODO: error
-                }
-
-                if (injections.containsKey(clname)) {
-                    try {
-                        ClassPool pool = ClassPool.getDefault();
-                        pool.appendClassPath(new LoaderClassPath(loader));
-                        pool.insertClassPath(new ByteArrayClassPath(clname, classfileBuffer));
-
-                        Injection injector = injections.get(clname);
-                        CtClass cc = pool.get(clname);
-
-                        injector.inject(pool, clname);
-
-                        LOGGER.info("Injected logic to: " + clname);
-                        return cc.toBytecode();
-                    } catch (Exception e) {
-                        ExitCode.CORE_TRANSFORMER_ERROR.throwFatalError("Class: " + clname + " | Exception: " + e.getMessage());
+                        modified = true;
                     }
+
+                    if (injections.containsKey(clname)) {
+                        if (cc == null) {
+                            cc = pool.get(clname);
+                            pool.appendClassPath(new LoaderClassPath(loader));
+                            pool.insertClassPath(new ByteArrayClassPath(clname, classfileBuffer));
+                        }
+
+                        injections.get(clname).inject(pool, clname);
+                        LOGGER.info("Injected logic to: " + clname);
+                        modified = true;
+                    }
+
+                    if (modified && cc != null) {
+                        return cc.toBytecode();
+                    }
+
+                } catch (Exception e) {
+                    LOGGER.error("Error transforming class " + clname, e);
                 }
 
                 return null;
@@ -153,9 +158,9 @@ public class FLoader {
     }
 
     public static void initModdingTools() {
-        LOGGER.info("Initializing ModManager...");
-        ModManager.init();
-        LOGGER.info("ModManager initialized.");
+//        LOGGER.info("Initializing ModManager...");
+//        ModManager.init();
+//        LOGGER.info("ModManager initialized.");
 
         LOGGER.info("Loading mods...");
         ModManager.initializeMods();

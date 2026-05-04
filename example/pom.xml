@@ -22,6 +22,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/floaderapi.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>age.of.civilizations2</groupId>
+            <artifactId>game</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/game.jar</systemPath>
+        </dependency>
     </dependencies>
 
 </project>

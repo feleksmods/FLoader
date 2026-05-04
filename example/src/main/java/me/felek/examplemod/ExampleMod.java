@@ -1,5 +1,7 @@
 package me.felek.examplemod;
 
+import age.of.civilizations2.jakowski.lukasz.Image;
+import me.felek.floader.api.FLoader;
 import me.felek.floader.api.IMod;
 import me.felek.floader.api.Mod;
 import me.felek.floader.api.event.EventBus;
@@ -21,6 +23,11 @@ public class ExampleMod implements IMod {
     public void onPreInitialization() {
         EventBus.subscribe("onGameInitialization", (args) -> {
             System.out.println("INITIALIZATION!");
+
+            Image img = FLoader.registryManager.loadImage("examplemod", "loading.png");
+
+            FLoader.registryManager.registerResource("examplemod", img);
+            FLoader.registryManager.registerLoadingScreen("examplemod:loading.png");
         });
     }
 }
