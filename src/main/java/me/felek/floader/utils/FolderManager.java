@@ -32,12 +32,4 @@ public class FolderManager {
 
         return null;
     }
-
-    public static String getAssetPath(String path) {
-        for (ModEntry mod : ModManager.LOADED_MODS) {
-            File file = new File("fmods/" + mod.id + "/assets/" + path);
-            if (file.exists()) return file.getAbsolutePath();
-        }
-        return null;
-    }
 }

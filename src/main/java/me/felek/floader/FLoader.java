@@ -28,7 +28,7 @@ import java.util.Map;
 import me.felek.floader.injection.injs.*;
 
 public class FLoader {
-    public static final String VERSION = "0.5Ct";
+    public static final String VERSION = "0.5D";
     public static final String NAME = "FLoader";//skids aren't allowed!
     public static final String FULL_NAME = NAME + " " + VERSION;
 
@@ -55,6 +55,10 @@ public class FLoader {
         registerInjections();
 
         me.felek.floader.api.FLoader.registryManager = new RegistryManager();
+        me.felek.floader.api.FLoader.game = new me.felek.floader.utils.impl.GameImpl();
+        me.felek.floader.api.FLoader.settings = new me.felek.floader.utils.impl.SettingsImpl();
+        me.felek.floader.api.FLoader.steam = new me.felek.floader.utils.impl.SteamImpl();
+        me.felek.floader.api.FLoader.utils = new me.felek.floader.utils.impl.UtilsImpl();
 
         inst.addTransformer(new ClassFileTransformer() {
             @Override

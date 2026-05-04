@@ -13,6 +13,7 @@
 > - 0.7Dt
 
 ## Versions
+- 0.5D - added built-in functions for helping modders :)
 - 0.5Ct - fixed resource loading, fixed mixin subsystem bug with loading AA_GameInject
 - 0.5Btf - added mixin subsystem for mods
 - 0.5At - test Java version
