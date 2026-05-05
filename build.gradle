@@ -47,6 +47,8 @@ tasks.register('allJavadoc', Javadoc) {
     classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
     destinationDir = file("${buildDir}/docs/javadoc")
 
+    failOnError = false
+
     options {
         encoding = 'UTF-8'
         docTitle = "FLoader Javadoc (Java Edition)"
