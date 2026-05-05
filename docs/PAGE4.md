@@ -1,40 +1,30 @@
-# Page 5 - fl.event and fl.utils and fl.res
-## fl.event
-This module allows you to create in-game events.
+# PAGE 4: Mixins
+Sometimes the standard API or Event System isn't enough. If you need to change how a specific game function works (for example, change the formula for calculating battle losses or modify the UI creation logic), you use **Mixins**.
 
-- showEvent(civID, title, description, imgKey): Shows a simple event for a civilization with a single "OK" button.
-- showAdvancedEvent(civID, title, description, imgKey, button1Text, button1Callback, button2Text, button2Callback, ...): Shows an event with multiple buttons, each with its own function.
+## 1. What is a mixin?
+A Mixin is a class in your mod that "injects" its code into an existing class of the game. FLoader uses Javassist to rewrite the game's bytecode at runtime, inserting calls to your Java methods.
 
-## fl.utils
-This module adds useful utilities.
+## 2. Basic structure
+To create a mixin, you need to use two main annotations:
 
-- log(message): Displays a message in the game console.
-- getTurnID(): Returns the current turn number.
-- reloadFL(): (Unsafe!) Reloads FLoader and all mods. Useful for quick development, but can lead to instability.
-- getMonthName(monthID): Returns the month name by its number.
+- **@Mixin**: Marks the class as a mixin and specifies the target game class.
+- **@Inject**: Marks a method to be injected into a specific game method.
 
-## fl.res
-This module allows you to perform various operations with mod resources.
+### Important rules
+- **Static Methods**: All injected methods in your mixin class must be public static
+- **Matching Arguments**: The arguments of your mixin method must exactly match the arguments of the game's method.
 
-- loadImage(modName, pathInAssets): Loads an image from your mod's assets folder.
-
-Here's an example with a custom event added:
-```lua
-local icon = fl.res.loadImage("ExampleMod", "culo.png")
-
-function showEvent()
-    local civId = fl.player.getPlayerCiv()
-        
-    local function onFirst()
-        print("You selected 1st option!")
-    end
-    
-    local function onSecond()
-        print("You selected 2nd option!")
-    end
-    
-    fl.event.showAdvancedEvent(civId, "example title", "duper cool event description", icon, "Option 1", onFirst, "Option 2", onSecond)
-end
-
-fl.registry.registerCommand("event", showEvent)
+## 3. Example
+```java
+@Mixin(target = "aoc.kingdoms.lukasz.jakowski.AA_Game")
+public class ExampleMixin {
+    @Inject(method = "create", at = At.RETURN)
+    public static void create() {
+        System.out.println("ExampleMixin called.");
+    }
+}
 ```
+
+## 4. Injection points (At)
+- **At.HEAD**: Your code will run at the very beginning of the game method, before any original logic.
+- **At.RETURN**: Your code will run at the very end of the method, just before it returns a value.

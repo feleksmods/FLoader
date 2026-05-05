@@ -28,7 +28,7 @@ import java.util.Map;
 import me.felek.floader.injection.injs.*;
 
 public class FLoader {
-    public static final String VERSION = "0.5D";
+    public static final String VERSION = "0.5E";
     public static final String NAME = "FLoader";//skids aren't allowed!
     public static final String FULL_NAME = NAME + " " + VERSION;
 

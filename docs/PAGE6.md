@@ -1,22 +1,69 @@
-# Page 6 - List of all events
-This is a **COMPLETE** list of all events currently available in the mod loader
+# Page 6 - Custom content
+FLoader allows you to extend the game by adding your own console commands, loading screen elements, and even radio stations. All of this is managed through the registryManager.
 
-- onGameInitialization: Called after the game has fully loaded and all FLoader systems have been initialized
-- onTurnEnd: Called at the end of each turn
-- onDayChange(daysPassed): Called when the day changes daysPassed (number) is the number of days that have passed
-- onMonthChange(newMonth): Called when the month changes newMonth (number) is the new month's number (1-12)
-- onCivDestroyed(civID): A civilization has been destroyed
-- onProvinceClick(provinceID): The player clicked on a province - onProvinceOwnerChanged(provinceID, newOwnerCivID, oldOwnerCivID): The province owner has changed
-- onCapitalMoved(civID, newCapitalProvID): The civilization has moved its capital
-- onIdeologyChanged(civID, newIdeologyID): The civilization has changed its ideology
-- onWarDeclared(aggressorCivID, defenderCivID): War has been declared
-- onPeaceSigned(peaceTreatyData): A peace treaty has been signed (argument - a complex object, for advanced use)
-- onUnionFormed(civA_ID, civB_ID): Two civilizations have formed an alliance
-- onAllianceFormed(allianceData): An alliance has been formed onVassalCreated(vassalData): A vassal has been created
-- onBuildingConstructed(civID, provinceID, buildingType): A building has been completed in the province
-- onBuildingDestroyed(civID, buildingID): The building has been destroyed (eg, by an event)
-- onLoanTaken(byCivID, toCivID): A loan has been taken out
-- onTreasuryEmpty: Called when the active player runs out of money
-- sendNukes(provinceID, byCivID): A nuke has been dropped on the province
-- onTechLeveledUp(civID, newTechLevel): The civilization has increased its technology level
-- onGoldChanged(civID, newGoldValue): The civilization's gold balance has changed - onTruceSigned(civA_ID, civB_ID, turns): Truce signed
+## Console commands
+ou can register custom commands that can be executed from the in-game console
+
+```java
+@Override
+public void onPreInitialization() {
+    FLoader.registryManager.registerCommand("mycmd", args -> {
+        // args[0] - command name
+        // args[1], args[N] - command arguments
+        if (args.length > 1) {
+            System.out.println("Command executed with parameter: " + args[1]);
+        } else {
+            System.out.println("Hello from FLoader console!");
+        }
+    });
+}
+```
+
+## Loading screen
+You can customize the player's experience even before the game starts.
+
+### Loading tips
+Add new text messages to the pool of random tips shown during startup.
+
+```java
+@Override
+public void onPreInitialization() {
+    FLoader.registryManager.registerLoadingTip("Hello from FLoader");
+    FLoader.registryManager.registerLoadingTip("Welcome back :)");
+}
+```
+
+### Custom loading screens
+To add a new loading screen background, you must first load the image and then register its key.
+
+```java
+@Override
+public void onEnable() {
+    EventBus.subscribe("onGameInitialization", args -> {
+        FLoader.registryManager.loadImage("myMod", "loading_bg.png");
+        FLoader.registryManager.registerLoadingScreen("myMod:loading_bg.png");
+    });
+}
+```
+
+## Custom radio stations
+You can create a new radio station with its own set of music tracks.
+
+```java
+@Override
+public void onPreInitialization() {
+    List<String> tracks = new ArrayList<>();
+    tracks.add("my_epic_song_1.mp3");
+    tracks.add("my_epic_song_2.mp3");
+
+    FLoader.registryManager.registerStation("Modded Radio", tracks);
+}
+```
+
+## Manual resource registration
+If you have an Image object created manually (not from the assets/ folder), you can register it in the global registry to make it accessible to other mods or Mixins.
+
+```java
+FLoader.registryManager.registerResource("my_custom_key", myImageObject);
+Image img = FLoader.registryManager.getResource("my_custom_key");
+```

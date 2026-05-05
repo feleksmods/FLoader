@@ -41,3 +41,16 @@ jar {
 shadowJar {
     archiveFileName.set('FLoader.jar')
 }
+
+tasks.register('allJavadoc', Javadoc) {
+    source subprojects.collect { it.sourceSets.main.allJava }
+    classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
+    destinationDir = file("${buildDir}/docs/javadoc")
+
+    options {
+        encoding = 'UTF-8'
+        docTitle = "FLoader Javadoc (Java Edition)"
+        windowTitle = "FLoader API"
+        addStringOption('Xdoclint:none', '-quiet')
+    }
+}

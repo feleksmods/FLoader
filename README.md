@@ -1,13 +1,14 @@
 # FLoader - a new era of modding for Age of History 2: Definitive Edition!
 
 **FLoader** is a powerful, fast, and efficient mod loader that will let you bring any idea to life!
-FLoader allows you to write high-performance mods thanks to a redesigned modding system. Instead of tedious file editing, mod developers can now write code in the convenient **Lua** language!
+Instead of tedious file editing or limited scripting, FLoader provides a native Java API and a robust Mixin system, allowing developers to hook into any part of the game logic with surgical precision and maximum efficiency.
 
 ## Features
-- **Game Security**: The original game code remains intact, ensuring that malicious code cannot be injected.
-- **Lua API**: Mods are written in the convenient and fast Lua programming language, allowing developers to realize any of their ideas!
+- **Java Native Power**: Write mods in pure Java. Enjoy type safety, modern language features (Java 21), and blazing-fast execution.
+-  **Advanced Mixin System**: Inject your code directly into the game's bytecode at runtime. Modify existing methods without touching the original `game.jar`.
 - **Event Architecture**: Mods can use the fast and convenient event bus, allowing for efficient management of the game world!
-- **Rich API**: The mod loader already provides over 100 new functions, allowing you to do things that are impossible with the standard loader.
+- **Deep Game API**: Over 100+ mapped functions to control civilizations, world data, diplomacy, and the Steam API (achievements, rich presence).
+- **Game Integrity**: The original game files remain untouched. FLoader works as a Java Agent, applying changes only in memory.
 
 ## Installation
 Installing and running FLoader takes just a few minutes!

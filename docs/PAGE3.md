@@ -1,34 +1,43 @@
-# Page 3 - World API
-This module allows you to retrieve and modify game world data.
+# Page 3: Assets & Resources
+FLoader features a robust asset management system. You can easily bundle textures, sounds, and other files inside your mod's JAR and even override original game files without touching the game.jar.
 
-Civilization-related functions:
-- getCivMoney(civID): Returns the civilization's money supply
-- setCivMoney(civID, amount): Sets the civilization's money supply
-- getCivName(civID): Returns the civilization's name
-- getCivTag(civID): Returns the civilization's tag
-- getCapitalId(civID): Returns the capital province's ID
-- getCivTechLevel(civID): Returns the technology level
-- getDiploPoints(civID): Returns diplomacy points
-- setCivIdeology(civID, ideologyID): Sets the civilization's ideology
-- declareWar(agressorCivID, defenderCivID): Declares war
-- setRelation(civA_ID, civB_ID, value): Sets the relationship from A to B (from -100 to 100)
+## Folder structure
+All your resources must be placed in the src/main/resources/assets/ directory of your project. When FLoader searches for a file, it looks inside this folder in all loaded mods.
 
-Province-related functions
-- getProvinceOwner(provinceID): Returns the province owner's CivID
-- setProvinceOwner(provinceID, newOwnerCivID): Instantly changes the province owner
-- getProvinceArmy(provinceID): Returns the number of armies in the province
-- getProvinceEconomy(provinceID): Returns the province's economy level
-- getProvincePopulation(provinceID): Returns the province's population
-- getProvinceStability(provinceID): Returns the province's stability
-- getProvinceHappiness(provinceID): Returns the province's happiness
-- isCapital(provinceID): Returns true if the province is the capital
-- dropNuke(provinceID, byCivID): Drops a nuke on the province on behalf of the civilization
+**Example structure**:
+```
+MyMod.jar
+└── assets/
+    ├── UI/
+    │   └── custom_button.png
+    ├── gfx/
+    │   └── flags/
+    │       └── POL.png   <-- This will override the vanilla Polish flag!
+    └── sounds/
+        └── my_music.mp3
+```
 
-Example code that sets the country '``15'`` to 5000 gold per code:
-```lua
-function onEvent() 
-    fl.world.setCivMoney(15, 5000)
-end
+## Loading Custom Images via API
+To use new images (for events, buttons, etc.) that aren't in the base game, you need to load them into memory using the registryManager.
+You cannot load images during onPreInitialization. You must wait until the game's graphics engine is ready. The best place is inside the onGameInitialization event.
 
-subscribe("onTurnEnd", onEvent)
+```java
+@Override
+public void onEnable() {
+    EventBus.subscribe("onGameInitialization", args -> {
+        //Load image from: src/main/resources/assets/icons/star.png
+        myCustomImage = FLoader.registryManager.loadImage("myMod", "icons/star.png");
+        
+        if (myCustomImage != null) {
+            System.out.println("Texture loaded successfully!");
+        }
+    });
+}
+```
+
+## Accessing Resources
+Once a resource is loaded, any mod can access it using its unique key:
+
+```java
+Image img = FLoader.registryManager.getResource("myMod:icons/star.png");
 ```
