@@ -149,6 +149,8 @@ public class FLoader {
 
         injections.put("age.of.civilizations2.jakowski.lukasz.Files.FileManager", new FileManagerInject());
         injections.put("age.of.civilizations2.jakowski.lukasz.SFXManager", new SFXManagerInject());
+
+        injections.put("age.of.civilizations2.jakowski.lukasz.MenuManager", new MenuManagerInject());
     }
 
     public static void init() {
