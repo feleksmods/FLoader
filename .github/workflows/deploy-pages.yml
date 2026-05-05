@@ -26,6 +26,8 @@ jobs:
         run: chmod +x gradlew
       - name: Generate Javadoc
         run: ./gradlew allJavadoc
+      - name: Check generated files
+        run: ls -R build/docs/javadoc
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
