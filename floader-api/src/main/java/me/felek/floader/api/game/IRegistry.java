@@ -1,6 +1,7 @@
 package me.felek.floader.api.game;
 
 import age.of.civilizations2.jakowski.lukasz.Image;
+import me.felek.floader.api.ui.CustomMenu;
 
 import java.util.List;
 import java.util.Map;
@@ -22,4 +23,7 @@ public interface IRegistry {
     age.of.civilizations2.jakowski.lukasz.Image getResource(String key);
     Map getCustomStations();
     Image loadImage(String modId, String path);
+
+    void registerMenu(String id, CustomMenu menu);
+    void openMenu(String id);
 }

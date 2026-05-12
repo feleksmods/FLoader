@@ -6,6 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import me.felek.floader.FLoader;
 import me.felek.floader.api.game.IRegistry;
+import me.felek.floader.api.ui.CustomMenu;
 
 import java.io.File;
 import java.util.*;
@@ -17,6 +18,42 @@ public class RegistryManager implements IRegistry {
     public final Map<String, Image> resources = new HashMap<>();
     public final List<String> customLoadingScreens = new ArrayList<>();
     public Map<String, List<String>> customStations = new HashMap<>();
+    public final Map<String, CustomMenu> customMenus = new HashMap<>();
+    public final Map<Integer, CustomMenu> activeCustomMenusMapping = new HashMap<>();
+
+    private int nextCustomId = 5000;//find real max ID in vanilla game
+
+    @Override
+    public void registerMenu(String id, CustomMenu menu) {
+        customMenus.put(id, menu);
+    }
+
+    public Object getCustomMenuByViewId(int viewId) {
+        return activeCustomMenusMapping.get(Integer.valueOf(viewId));
+    }
+
+    @Override
+    public void openMenu(String id) {
+        try {
+            java.lang.reflect.Method method = age.of.civilizations2.jakowski.lukasz.CFG.menus.getClass()
+                    .getMethod("openCustomMenu", new Class[]{String.class});
+            method.invoke(age.of.civilizations2.jakowski.lukasz.CFG.menus, new Object[]{id});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Object getCustomMenu(String key) {
+        return customMenus.get(key);
+    }
+
+    public void putActiveMapping(int viewId, Object menu) {
+        activeCustomMenusMapping.put(Integer.valueOf(viewId), (CustomMenu)menu);
+    }
+
+    public boolean isCustomMenu(int viewId) {
+        return activeCustomMenusMapping.containsKey(Integer.valueOf(viewId));
+    }
 
     public void registerStation(String name, List<String> tracks) {
         customStations.put(name, tracks);

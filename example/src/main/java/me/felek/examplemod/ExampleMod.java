@@ -2,6 +2,7 @@ package me.felek.examplemod;
 
 import age.of.civilizations2.jakowski.lukasz.CFG;
 import age.of.civilizations2.jakowski.lukasz.Image;
+import age.of.civilizations2.jakowski.lukasz.MenuManager;
 import me.felek.floader.api.FLoader;
 import me.felek.floader.api.IMod;
 import me.felek.floader.api.Mod;
@@ -13,6 +14,7 @@ public class ExampleMod implements IMod {
     @Override
     public void onEnable() {
         System.out.println("enabled");
+        FLoader.registryManager.registerMenu("lol", new MyCustomMenu());
     }
 
     @Override
@@ -23,7 +25,7 @@ public class ExampleMod implements IMod {
     @Override
     public void onPreInitialization() {
         FLoader.registryManager.registerCommand("something", (args) -> {
-            CFG.core.getCiv(CFG.core.getPlayer(CFG.PLAYER_TURN_ID).getCivId()).setGold(Long.parseLong(args[1]));
+            FLoader.registryManager.openMenu("lol");
         });
     }
 }
