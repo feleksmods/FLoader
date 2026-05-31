@@ -38,6 +38,7 @@ public class UIUtils {//i hate javaassist
                 List menus = (List) menusField.get(mm);
                 List orderOfMenu = (List) orderField.get(mm);
 
+                int previousViewID = (Integer) viewIdField.get(mm);
                 int newViewID = menus.size();
 
                 menus.add(new ArrayList());
@@ -49,6 +50,7 @@ public class UIUtils {//i hate javaassist
                 viewIdField.set(mm, newViewID);
 
                 reg.activeCustomMenusMapping.put(Integer.valueOf(newViewID), cMenu);
+                reg.customMenuPreviousView.put(Integer.valueOf(newViewID), Integer.valueOf(previousViewID));
 
                 Render.updateRenderer();
                 CFG.setRenderO(true);

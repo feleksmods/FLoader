@@ -13,6 +13,7 @@
 > - 0.7Dt
 
 ## Versions
+- 0.6B - fixed error with leaving from menu
 - 0.6A - added custom menus feature
 - 0.5E - added docs and removed dead code
 - 0.5D - added built-in functions for helping modders :)

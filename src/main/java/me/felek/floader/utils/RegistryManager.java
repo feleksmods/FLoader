@@ -20,6 +20,7 @@ public class RegistryManager implements IRegistry {
     public Map<String, List<String>> customStations = new HashMap<>();
     public final Map<String, CustomMenu> customMenus = new HashMap<>();
     public final Map<Integer, CustomMenu> activeCustomMenusMapping = new HashMap<>();
+    public final Map<Integer, Integer> customMenuPreviousView = new HashMap<>();
 
     private int nextCustomId = 5000;//find real max ID in vanilla game
 

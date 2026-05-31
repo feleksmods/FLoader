@@ -19,14 +19,34 @@ public class MenuManagerInject implements Injection {
         cc.getDeclaredField("activeMenuElemeID").setModifiers(Modifier.PUBLIC);
         cc.getDeclaredField("keyboardActiveMenuElementID").setModifiers(Modifier.PUBLIC);
 
+        CtMethod setByInt = CtNewMethod.make(
+                "public void setMenuIDByInt(int id) {" +
+                        "  this.resetHoverActive();" +
+                        "  this.keyboard.setVisibleM(false);" +
+                        "  this.fromViewID = this.viewID;" +
+                        "  this.toViewID = id;" +
+                        "  this.viewID = id;" +
+                        "  age.of.civilizations2.jakowski.lukasz.CFG.setRenderO(true);" +
+                        "  this.updateViewID();" +
+                        "}", cc);
+        cc.addMethod(setByInt);
+
         CtMethod actionElem = cc.getDeclaredMethod("actionElem");
         actionElem.insertBefore(
                 "{" +
                         "  me.felek.floader.utils.RegistryManager reg = (me.felek.floader.utils.RegistryManager)me.felek.floader.api.FLoader.registryManager;" +
-                        "  Object activeC = reg.activeCustomMenusMapping.get(new java.lang.Integer(this.viewID));" +
+                        "  java.lang.Integer currentViewObj = new java.lang.Integer(this.viewID);" +
+                        "  Object activeC = reg.activeCustomMenusMapping.get(currentViewObj);" +
                         "  if (activeC != null) {" +
                         "    if ($2 == 0) {" +
-                        "      this.setMenuID(age.of.civilizations2.jakowski.lukasz.CFG.backToMenu);" +
+                        "      java.lang.Integer prevView = (java.lang.Integer) reg.customMenuPreviousView.get(currentViewObj);" +
+                        "      if (prevView != null) {" +
+                        "         this.setMenuIDByInt(prevView.intValue());" +
+                        "      } else {" +
+                        "         this.setMenuID(age.of.civilizations2.jakowski.lukasz.View.eMAINMENU);" +
+                        "      }" +
+                        "      reg.activeCustomMenusMapping.remove(currentViewObj);" +
+                        "      reg.customMenuPreviousView.remove(currentViewObj);" +
                         "    } else {" +
                         "      age.of.civilizations2.jakowski.lukasz.Button.MenuElemUI clickedElem = this.getMenuElement($1, $2);" +
                         "      if (clickedElem instanceof age.of.civilizations2.jakowski.lukasz.Button.Button_Keyboard) {" +
@@ -43,8 +63,16 @@ public class MenuManagerInject implements Injection {
         back.insertBefore(
                 "{" +
                         "  me.felek.floader.utils.RegistryManager reg = (me.felek.floader.utils.RegistryManager)me.felek.floader.api.FLoader.registryManager;" +
-                        "  if (reg.activeCustomMenusMapping.containsKey(new java.lang.Integer(this.viewID))) {" +
-                        "    this.setMenuID(age.of.civilizations2.jakowski.lukasz.View.eMAINMENU);" +
+                        "  java.lang.Integer currentViewObj = new java.lang.Integer(this.viewID);" +
+                        "  if (reg.activeCustomMenusMapping.containsKey(currentViewObj)) {" +
+                        "    java.lang.Integer prevView = (java.lang.Integer) reg.customMenuPreviousView.get(currentViewObj);" +
+                        "    if (prevView != null) {" +
+                        "       this.setMenuIDByInt(prevView.intValue());" +
+                        "    } else {" +
+                        "       this.setMenuID(age.of.civilizations2.jakowski.lukasz.View.eMAINMENU);" +
+                        "    }" +
+                        "    reg.activeCustomMenusMapping.remove(currentViewObj);" +
+                        "    reg.customMenuPreviousView.remove(currentViewObj);" +
                         "    return;" +
                         "  }" +
                         "}"
